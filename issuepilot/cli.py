@@ -22,8 +22,10 @@ def main():
     result = investigate(api, OpenAI(), model=args.model)
     Path(args.output).write_text(result.report + "\n", encoding="utf-8")
     Path(args.trace).write_text(json.dumps({"model": result.model, "tool_calls": result.tool_calls,
-                                             "usage": result.usage}, indent=2), encoding="utf-8")
+                                             "usage": result.usage, "status": result.status}, indent=2), encoding="utf-8")
     print(result.report)
+    if result.status == "budget_limited":
+        print("\nNote: Investigation stopped at the exploration budget; conclusions are provisional.")
     print(f"\nReport: {args.output} | Trace: {args.trace} | tool calls: {len(result.tool_calls)}")
 
 
