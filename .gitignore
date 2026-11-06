@@ -232,3 +232,4 @@ validation-report.json
 # Generated V4 drafts and metadata
 issuepilot-fix.patch
 issuepilot-patch-manifest.json
+issuepilot-run.json

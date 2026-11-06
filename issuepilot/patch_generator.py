@@ -13,10 +13,11 @@ import difflib
 import hashlib
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Any
 
-from issuepilot.github_api import GitHubAPI, allowed_path, parse_issue_url
+from issuepilot.github_api import SHA_RE, GitHubAPI, allowed_path, parse_issue_url
 
 
 MAX_FILES = 4
@@ -64,8 +65,9 @@ Every 'path' must be one of the supplied file paths; 'old' MUST be a verbatim,
 continuous excerpt of that file, including indentation, exact spelling and
 line breaks. 'new' is the exact replacement text. NEVER fabricate method
 signatures or code that was not in the provided sources. Prefer small,
-high-confidence edits; for security/expiry behavior inspect the relevant
-verification path and avoid redirecting validation into payload decoding.
+high-confidence edits. Before changing how an argument or value is handled,
+confirm in the supplied sources where it is actually consumed; do not move a
+check into an unrelated code path.
 If a safe patch cannot be justified, return an EMPTY edits array.
 When tests are among the supplied files, prefer a regression test that fails
 before the code fix and passes after. Preserve existing compatibility unless
@@ -135,16 +137,22 @@ def generate(
     files: list[str],
     investigation: str = "",
     model: str = "gpt-5-mini",
+    revision: str | None = None,
 ) -> tuple[str, dict]:
     """Fetch pinned sources, ask for edit anchors and construct/verify a real diff.
 
+    Pass ``revision`` to reuse a commit already pinned by an earlier stage
+    (e.g. automatic discovery) so every stage reads identical bytes.
     No files are written and no external code is run by this function.
     """
     if not 1 <= len(files) <= MAX_FILES or len(set(files)) != len(files):
         raise ValueError("Choose 1-4 unique Python files to inspect")
     if any(not allowed_path(p) or not p.endswith(".py") for p in files):
         raise ValueError("Only permitted Python paths can be selected")
-    revision = api.get_repository_revision()
+    if revision is None:
+        revision = api.get_repository_revision()
+    elif not SHA_RE.fullmatch(revision):
+        raise ValueError("Expected an immutable 40-character Git commit SHA")
     sources = {path: api.read_source_at_revision(path, revision) for path in files}
     if sum(len(source.encode("utf-8")) for source in sources.values()) > MAX_TOTAL_BYTES:
         raise ValueError("Selected source files exceed the 44KB prompt limit")
@@ -193,38 +201,96 @@ def generate(
     return patch, metadata
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate a real source-grounded *draft* git diff")
-    parser.add_argument("issue_url", help="https://github.com/OWNER/REPO/issues/NUMBER")
-    parser.add_argument("--files", nargs="+", required=True,
-                        help="Full repository-relative Python paths; include tests for regression coverage")
-    parser.add_argument("--investigation", type=Path, help="Optional existing investigation.md")
-    parser.add_argument("--model", default="gpt-5-mini")
-    parser.add_argument("--output", type=Path, default=Path("issuepilot-fix.patch"))
-    parser.add_argument("--manifest", type=Path, default=Path("issuepilot-patch-manifest.json"))
-    parser.add_argument("--overwrite", action="store_true",
-                        help="Allow overwriting existing output files")
-    args = parser.parse_args()
-    if args.output.resolve() == args.manifest.resolve():
-        parser.error("Patch and manifest outputs must have distinct file paths")
-    if not args.overwrite and (args.output.exists() or args.manifest.exists()):
-        parser.error("An output file already exists; change the paths or pass --overwrite")
-    if not os.getenv("OPENAI_API_KEY"):
-        parser.error("OPENAI_API_KEY is required for live patch generation")
+def _openai_client() -> Any:
     from openai import OpenAI
 
-    api = GitHubAPI(parse_issue_url(args.issue_url))
-    prior = args.investigation.read_text(encoding="utf-8") if args.investigation else ""
+    return OpenAI()
+
+
+def main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(
+        description="Generate a real source-grounded *draft* git diff. With only an issue URL, "
+                    "IssuePilot checks eligibility and discovers source/test files automatically.")
+    parser.add_argument("issue_url", help="https://github.com/OWNER/REPO/issues/NUMBER")
+    parser.add_argument("--files", nargs="+",
+                        help="Manual mode: full repository-relative Python paths (include tests). "
+                             "Omit for automatic eligibility checking and file discovery.")
+    parser.add_argument("--investigation", type=Path, help="Optional existing investigation.md")
+    parser.add_argument("--model", default="gpt-5-mini")
+    parser.add_argument("--revision", help="Pin every read to this 40-character commit SHA "
+                                           "instead of the default branch head")
+    parser.add_argument("--output", type=Path, default=Path("issuepilot-fix.patch"))
+    parser.add_argument("--manifest", type=Path, default=Path("issuepilot-patch-manifest.json"))
+    parser.add_argument("--run-record", type=Path, default=Path("issuepilot-run.json"),
+                        help="Automatic mode: decision/audit record (written for every outcome)")
+    parser.add_argument("--stop-after", choices=["eligibility", "discovery"],
+                        help="Automatic mode: stop before the patch-generation model call")
+    parser.add_argument("--max-tool-calls", type=int,
+                        help="Automatic mode: discovery exploration budget (1-40, default 14)")
+    parser.add_argument("--overwrite", action="store_true",
+                        help="Allow overwriting existing output files")
+    args = parser.parse_args(argv)
+    auto = not args.files
+    outputs = [args.output, args.manifest] + ([args.run_record] if auto else [])
+    if len({path.resolve() for path in outputs}) != len(outputs):
+        parser.error("Patch, manifest and run-record outputs must have distinct file paths")
+    if not args.overwrite and any(path.exists() for path in outputs):
+        parser.error("An output file already exists; change the paths or pass --overwrite")
+    if not auto and (args.stop_after or args.max_tool_calls is not None):
+        parser.error("--stop-after and --max-tool-calls apply only without --files")
+    if args.max_tool_calls is None:
+        args.max_tool_calls = 14
+    if not 1 <= args.max_tool_calls <= 40:
+        parser.error("--max-tool-calls must be between 1 and 40")
+    if args.revision is not None and not SHA_RE.fullmatch(args.revision):
+        parser.error("--revision must be a full 40-character lowercase commit SHA")
+    if not os.getenv("OPENAI_API_KEY"):
+        parser.error("OPENAI_API_KEY is required for live patch generation")
     try:
-        diff, manifest = generate(api, OpenAI(), args.files, prior, args.model)
+        api = GitHubAPI(parse_issue_url(args.issue_url))
+    except ValueError as exc:
+        parser.error(str(exc))
+    prior = args.investigation.read_text(encoding="utf-8") if args.investigation else ""
+    client = _openai_client()
+
+    if auto:
+        _run_automatic(args, api, client, prior)
+        return
+    try:
+        revision = api.resolve_revision(args.revision) if args.revision else None
+        diff, manifest = generate(api, client, args.files, prior, args.model, revision=revision)
     except (ValueError, KeyError, OSError) as exc:
         parser.error(str(exc))
+    _write_draft(args, diff, manifest)
+
+
+def _write_draft(args: argparse.Namespace, diff: str, manifest: dict) -> None:
     args.output.write_text(diff, encoding="utf-8")
     args.manifest.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     print(f"Created unverified draft: {args.output}")
     print(f"Pinned source SHA: {manifest['base_commit']}")
     print(f"Manifest: {args.manifest}")
     print("Review the diff and check out the pinned revision before running Docker.")
+
+
+def _run_automatic(args: argparse.Namespace, api: GitHubAPI, client: Any, prior: str) -> None:
+    from issuepilot.pipeline import run_auto
+
+    result = run_auto(api, client, model=args.model, revision=args.revision,
+                      investigation=prior, stop_after=args.stop_after,
+                      max_tool_calls=args.max_tool_calls)
+    args.run_record.write_text(json.dumps(result.record(), indent=2), encoding="utf-8")
+    print(f"Status: {result.status} (stage: {result.stage})")
+    if result.detail:
+        print(f"Detail: {result.detail}")
+    if result.discovery and result.discovery.get("source_files"):
+        print("Selected source files: " + ", ".join(result.discovery["source_files"]))
+        print("Selected test files: " + (", ".join(result.discovery["test_files"]) or "(none)"))
+    if result.patch is not None and result.manifest is not None:
+        _write_draft(args, result.patch, result.manifest)
+    print(f"Run record: {args.run_record}")
+    if result.exit_code:
+        sys.exit(result.exit_code)
 
 
 if __name__ == "__main__":

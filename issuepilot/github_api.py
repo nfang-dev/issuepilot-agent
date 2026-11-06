@@ -12,6 +12,7 @@ import requests
 from issuepilot.code_intelligence import find_text_matches, inspect_python_symbols, rank_file_paths
 
 ISSUE_RE = re.compile(r"^https://github\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)/issues/([1-9][0-9]*)(?:/)?(?:[?#].*)?$")
+SHA_RE = re.compile(r"[a-f0-9]{40}")
 ALLOWED_SUFFIXES = {".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".java", ".md", ".json", ".toml", ".yaml", ".yml", ".rs", ".cpp", ".h"}
 
 
@@ -54,6 +55,8 @@ class GitHubAPI:
             self.session.headers["Authorization"] = f"Bearer {token}"
         self._branch: str | None = None
         self._paths: list[str] | None = None
+        self._metadata: dict | None = None
+        self._trees: dict[str, dict] = {}
 
     def _get(self, endpoint: str, **params):
         # _get is only used with hardcoded GitHub API endpoints below.
@@ -164,15 +167,81 @@ class GitHubAPI:
             return {"error": "Cannot decode Python source"}
         return inspect_python_symbols(content, path, symbol, raw.get("html_url", ""))
 
+    def get_repository_metadata(self) -> dict:
+        """Repository facts used by eligibility checks (fetched once, then cached)."""
+        if self._metadata is None:
+            raw = self._get(self.prefix)
+            self._metadata = {
+                "default_branch": raw["default_branch"],
+                "language": raw.get("language"),
+                "archived": bool(raw.get("archived", False)),
+                "disabled": bool(raw.get("disabled", False)),
+            }
+        return dict(self._metadata)
+
     def get_repository_revision(self) -> str:
         """Pin model inputs to one immutable commit, not a moving branch."""
-        metadata = self._get(self.prefix)
-        branch = metadata["default_branch"]
+        branch = self.get_repository_metadata()["default_branch"]
         commit = self._get(f"{self.prefix}/commits/{quote(branch, safe='')}")
         sha = commit["sha"]
-        if not re.fullmatch(r"[a-f0-9]{40}", sha):
+        if not SHA_RE.fullmatch(sha):
             raise ValueError("GitHub returned an invalid commit SHA")
         return sha
+
+    def resolve_revision(self, revision: str | None = None) -> str:
+        """Return the commit every later read is pinned to.
+
+        With no argument this is the default branch head *resolved once*. An
+        explicit SHA (e.g. the parent of a known fix, for evaluation) must be a
+        full 40-character hash that GitHub confirms exists in this repository.
+        """
+        if revision is None:
+            return self.get_repository_revision()
+        if not isinstance(revision, str) or not SHA_RE.fullmatch(revision):
+            raise ValueError("Expected an immutable 40-character Git commit SHA")
+        commit = self._get(f"{self.prefix}/commits/{revision}")
+        if commit.get("sha") != revision:
+            raise ValueError("GitHub did not confirm the requested commit SHA")
+        return revision
+
+    def list_tree_at_revision(self, revision: str) -> dict:
+        """Permitted blob paths and byte sizes at one immutable commit (cached)."""
+        if not SHA_RE.fullmatch(revision):
+            raise ValueError("Expected an immutable 40-character Git commit SHA")
+        if revision not in self._trees:
+            tree = self._get(f"{self.prefix}/git/trees/{revision}", recursive=1)
+            files = {
+                item["path"]: int(item.get("size") or 0)
+                for item in tree.get("tree", [])
+                if item.get("type") == "blob" and allowed_path(item.get("path", ""))
+            }
+            self._trees[revision] = {"files": files, "truncated": bool(tree.get("truncated"))}
+        cached = self._trees[revision]
+        return {"files": dict(cached["files"]), "truncated": cached["truncated"]}
+
+    def read_text_at_revision(self, path: str, revision: str, max_bytes: int = 40_000) -> str:
+        """Read one permitted UTF-8 file that exists in the pinned tree.
+
+        Raises ValueError instead of returning partial or unpinned content.
+        """
+        if not allowed_path(path):
+            raise ValueError("File path is not permitted")
+        sizes = self.list_tree_at_revision(revision)["files"]
+        if path not in sizes:
+            raise ValueError(f"File is not in the pinned repository tree: {path}")
+        if sizes[path] > max_bytes:
+            raise ValueError(f"File exceeds {max_bytes} byte read limit: {path}")
+        raw = self._get(f"{self.prefix}/contents/{quote(path, safe='/')}", ref=revision)
+        if raw.get("type") != "file" or raw.get("encoding") != "base64":
+            raise ValueError(f"Unsupported GitHub content response: {path}")
+        try:
+            data = base64.b64decode(raw["content"])
+            text = data.decode("utf-8")
+        except (UnicodeError, ValueError, KeyError) as exc:
+            raise ValueError(f"File cannot be read as UTF-8: {path}") from exc
+        if len(data) > max_bytes:
+            raise ValueError(f"File exceeds {max_bytes} byte read limit: {path}")
+        return text
 
     def read_source_at_revision(self, path: str, revision: str) -> str:
         """Fetch a *complete* permitted Python source file at a pinned commit.

@@ -1,4 +1,4 @@
-# IssuePilot — AI-Assisted GitHub Bug Investigation (V4 Source-grounded Patch Drafts)
+# IssuePilot — AI-Assisted GitHub Bug Investigation (V5 URL-only Draft Fixes)
 
 A small but genuine **agentic AI** project: an LLM can choose which **read-only GitHub API tools** to call, inspect an issue and related source context, and produce an evidence-backed investigation report. Unlike document Q&A / RAG, this demonstrates multi-step tool use and a bounded agent execution loop.
 
@@ -12,6 +12,7 @@ A small but genuine **agentic AI** project: an LLM can choose which **read-only 
 - Optional `--propose-patch` generates a separate, **unverified Markdown patch suggestion** after investigation. It never writes to the target GitHub repository or executes a patch.
 - Restricts investigation to the requested repository; rejects path traversal and secret-like file paths.
 - Adds budgets (6 exploratory model rounds, 12 tool calls), caches repeated tool requests, and forces a final synthesis with tools disabled when a budget is reached. Reports and safe tool-call audit JSON are saved locally.
+- **V5:** from only an issue URL, an eligibility gate and a bounded file-discovery agent choose the source and test files for the source-grounded patch generator, with every stage pinned to one commit and explicit `unsupported` / `needs_review` outcomes.
 - Automated offline tests for the GitHub API adapter, agent orchestration, safety controls, and budget handling; no API key needed for tests.
 
 ## Setup
@@ -55,6 +56,59 @@ issuepilot "https://github.com/OWNER/REPO/issues/NUMBER" --model gpt-5-mini
 ```
 
 The default model, `gpt-5-mini`, supports Responses tool calling. GitHub unauthenticated rate limits may interrupt large investigations; `GITHUB_TOKEN` is optional. See [OpenAI function calling](https://developers.openai.com/api/docs/guides/function-calling) and [GitHub REST API](https://docs.github.com/en/rest).
+
+## V5 URL-only Draft Fixes (automatic eligibility + file discovery)
+
+**Status:** Implemented with deterministic offline tests on synthetic projects and a scripted model. **The automatic pipeline has not yet been run against a live model or a real GitHub issue**, so no real-world repair, discovery accuracy or success rate is claimed.
+
+```bash
+python -m issuepilot.patch_generator "https://github.com/OWNER/REPO/issues/NUMBER"
+# or, after `pip install -e .`
+issuepilot-fix "https://github.com/OWNER/REPO/issues/NUMBER"
+```
+
+Passing `--files` keeps the V4 manual behaviour exactly; omitting it runs:
+
+```mermaid
+flowchart LR
+    URL[Issue URL] --> PIN[Resolve default branch ONCE to a commit SHA]
+    PIN --> E{Eligibility gate}
+    E -->|deterministic checks| E1["archived repo, no Python source, blocking labels, closed issue, thin report"]
+    E -->|structured LLM classification mapped by a fixed policy table| E2["category, reproduction, confidence, design decision"]
+    E -->|eligible| D[Bounded discovery agent]
+    D -->|read-only tools at pinned SHA| T["list_python_files, search_code, read_file, inspect_python_symbol, find_test_files"]
+    D -->|submit_file_selection| V{Deterministic grounding validation}
+    V -->|rejected: problems returned to model| D
+    V -->|selected| G[V4 source-grounded patch generator at the same SHA]
+    G --> OUT["issuepilot-fix.patch, manifest, issuepilot-run.json"]
+    OUT --> H[Human review] --> S["Docker sandbox with --approve"]
+```
+
+**Eligibility gate** (`issuepilot/eligibility.py`). Deterministic checks run first and cannot be overridden by the model: archived repository, no non-test Python source at the pinned commit, generic blocking labels (`enhancement`, `documentation`, `question`, ...), conflicting labels, non-Python primary language, a closed issue without an explicit `--revision`, or a too-short report. Only then is the model asked for a strict-JSON classification (category, reproduction present, expected-vs-actual, design decision needed, confidence). Code maps those fields to a status through a fixed policy table; malformed output fails closed to `needs_review`. Identifiers the classifier reports are kept as discovery hints only if they literally appear in the issue text.
+
+**Discovery agent** (`issuepilot/discovery.py`). An OpenAI Responses tool loop (`tool_choice="required"`, no parallel calls) with five read-only tools bound to the pinned SHA. It ends only through `submit_file_selection`, whose arguments are validated against an evidence ledger of what the tools actually returned:
+
+- every path exists in the pinned tree and is a permitted `.py` file within the patch generator's size limits;
+- every selected **source** file was read (`read_file` or a matching `inspect_python_symbol`) and is library code (not tests, docs, examples, `setup.py` or vendored code);
+- every selected **test** file surfaced in `find_test_files`, `search_code` or `read_file`;
+- evidence citations reference only paths returned by tools.
+
+Rejected submissions go back to the model with concrete problems (max 3 attempts). Budgets: 10 model rounds, 14 exploration calls (`--max-tool-calls`), 40 file fetches. When the exploration budget is spent the model gets one final round in which **only** the submit tool is offered; if that does not produce a valid selection, the run ends as `needs_review` with deterministically ranked provisional candidates. A low-confidence selection is never patched automatically.
+
+**Outcomes and exit codes.** `issuepilot-run.json` is written for every outcome (decisions, tool names/arguments, per-stage token usage; no fetched source text).
+
+| Status | Exit | Meaning |
+| --- | --- | --- |
+| `draft_ready` | 0 | Unverified diff and manifest written |
+| `eligible` / `files_selected` | 0 | Stopped early via `--stop-after eligibility` or `--stop-after discovery` |
+| `unsupported` | 3 | Out of scope (not a Python library logic bug, or code outside Python source) |
+| `needs_review` | 4 | Ambiguous, low confidence, budget exhausted, or invalid selections |
+| `patch_failed` | 5 | Generator refused: fabricated/ambiguous anchors, syntax error, empty or test-only edits |
+| `error` | 1 | GitHub/API failure |
+
+`--revision SHA` pins every stage to an explicit commit (for example the parent of a known fix, for evaluation against closed issues). The manifest keeps `schema_version: 1`, so the existing sandbox provenance check works unchanged.
+
+**What the tests cover.** `tests/synthetic_github.py` serves several synthetic projects (src layout, flat layout with nested tests, a C++-backed extension, a JavaScript repo, a mixed-language repo) through a fake GitHub REST API with commit-addressable trees. Scripted model replies drive unsupported and needs-review paths, wrong file selections, tool- and round-budget exhaustion, GitHub failures, unsafe tool arguments, generator failures, branch movement mid-run, and the CLI. Two end-to-end tests apply the generated diff to a local copy of a synthetic project and show its regression test failing before and passing after the source change. These validate the pipeline mechanics when the model proposes the right edit; they are **not** evidence of live model quality.
 
 ## V4 Source-grounded Patch Generation (real `git diff`)
 
@@ -140,6 +194,8 @@ flowchart TD
     R --> P[Optional draft-only patch proposal]
     P --> H[Human review]
     R --> Q[V4 pinned source and exact-edit patch generator]
+    U --> EG[V5 eligibility gate and bounded file discovery]
+    EG --> Q
     Q --> H
     H --> D[Local Docker patch and pytest validation]
 ```
@@ -169,6 +225,7 @@ A manual live run was completed on November 5, 2026 (US Pacific time), using the
 - [ ] Generate a real source-grounded patch for issue #429 and manually verify its claims.
 - [ ] Run source-pinned Docker validation on that reviewed patch with a regression test.
 - [ ] Run at least two further issues across another public repository.
+- [ ] Run the V5 URL-only pipeline live on several public issues (including closed issues pinned with `--revision` to the commit before their fix); record eligibility decisions, selected files versus the files the real fix touched, and failure reasons.
 - [ ] Review `tool-trace.json` for exact call sequence, failures, and token usage; record latency.
 - [ ] Compare against a one-shot issue summarization baseline and score evidence grounding and proposed fixes.
 
@@ -177,6 +234,10 @@ A manual live run was completed on November 5, 2026 (US Pacific time), using the
 ## Suggested resume bullet (after live validation)
 
 > Developed an AI-assisted GitHub bug investigation agent using Python and OpenAI function calling, featuring bounded code search, AST symbol inspection, and source-linked diagnoses; added a manually approved local Docker patch-validation workflow with pytest and structured test results.
+
+What V5 adds, in wording that matches what is currently tested (offline only):
+
+> Built a URL-only pipeline that gates GitHub issues for eligibility and runs a bounded tool-calling agent to locate source and test files at a pinned commit, validating its structured selections against tool evidence before source-grounded diff generation; covered with deterministic tests across synthetic multi-project fixtures.
 
 ## Development
 
