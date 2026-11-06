@@ -13,7 +13,7 @@ from typing import Any
 import requests
 
 from issuepilot.discovery import SELECTED, discover_files
-from issuepilot.eligibility import ELIGIBLE, check_eligibility, is_test_path
+from issuepilot.eligibility import ELIGIBLE, NEEDS_REVIEW as ELIGIBILITY_REVIEW, check_eligibility, is_test_path
 from issuepilot.patch_generator import generate, sha256_text
 
 # Run statuses and CLI exit codes.
@@ -86,6 +86,7 @@ def run_auto(
     stop_after: str | None = None,
     max_tool_calls: int = 14,
     max_rounds: int = 10,
+    accept_needs_review: bool = False,
 ) -> RunResult:
     if stop_after not in (None, "eligibility", "discovery"):
         raise ValueError("stop_after must be eligibility, discovery or None")
@@ -110,7 +111,10 @@ def run_auto(
         decision = check_eligibility(issue, comments, api.get_repository_metadata(), tree, meter,
                                      model=model, explicit_revision=revision is not None)
         run.eligibility = decision.to_dict()
-        if decision.status != ELIGIBLE:
+        # A human may continue past needs_review (never past unsupported); recorded for audit.
+        overridden = accept_needs_review and decision.status == ELIGIBILITY_REVIEW
+        run.eligibility["human_override"] = overridden
+        if decision.status != ELIGIBLE and not overridden:
             run.status = decision.status
             run.detail = "; ".join(r["detail"] for r in decision.reasons)
             return run

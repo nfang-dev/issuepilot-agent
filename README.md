@@ -106,7 +106,7 @@ Rejected submissions go back to the model with concrete problems (max 3 attempts
 | `patch_failed` | 5 | Generator refused: fabricated/ambiguous anchors, syntax error, empty or test-only edits |
 | `error` | 1 | GitHub/API failure |
 
-`--revision SHA` pins every stage to an explicit commit (for example the parent of a known fix, for evaluation against closed issues). The manifest keeps `schema_version: 1`, so the existing sandbox provenance check works unchanged.
+`--accept-needs-review` lets a human continue past an eligibility `needs_review` (never past `unsupported`); the run record marks it as `human_override: true`. `--revision SHA` pins every stage to an explicit commit (for example the parent of a known fix, for evaluation against closed issues). The manifest keeps `schema_version: 1`, so the existing sandbox provenance check works unchanged.
 
 **What the tests cover.** `tests/synthetic_github.py` serves several synthetic projects (src layout, flat layout with nested tests, a C++-backed extension, a JavaScript repo, a mixed-language repo) through a fake GitHub REST API with commit-addressable trees. Scripted model replies drive unsupported and needs-review paths, wrong file selections, tool- and round-budget exhaustion, GitHub failures, unsafe tool arguments, generator failures, branch movement mid-run, and the CLI. Two end-to-end tests apply the generated diff to a local copy of a synthetic project and show its regression test failing before and passing after the source change. These validate the pipeline mechanics when the model proposes the right edit; they are **not** evidence of live model quality.
 

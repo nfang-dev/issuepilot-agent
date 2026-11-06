@@ -227,6 +227,9 @@ def main(argv: list[str] | None = None) -> None:
                         help="Automatic mode: stop before the patch-generation model call")
     parser.add_argument("--max-tool-calls", type=int,
                         help="Automatic mode: discovery exploration budget (1-40, default 14)")
+    parser.add_argument("--accept-needs-review", action="store_true",
+                        help="Automatic mode: continue when eligibility returns needs_review "
+                             "(never unsupported); recorded in the run record")
     parser.add_argument("--overwrite", action="store_true",
                         help="Allow overwriting existing output files")
     args = parser.parse_args(argv)
@@ -238,8 +241,8 @@ def main(argv: list[str] | None = None) -> None:
     written = [args.run_record] if auto and args.stop_after else outputs
     if not args.overwrite and any(path.exists() for path in written):
         parser.error("An output file already exists; change the paths or pass --overwrite")
-    if not auto and (args.stop_after or args.max_tool_calls is not None):
-        parser.error("--stop-after and --max-tool-calls apply only without --files")
+    if not auto and (args.stop_after or args.max_tool_calls is not None or args.accept_needs_review):
+        parser.error("--stop-after, --max-tool-calls and --accept-needs-review apply only without --files")
     if args.max_tool_calls is None:
         args.max_tool_calls = 14
     if not 1 <= args.max_tool_calls <= 40:
@@ -280,7 +283,8 @@ def _run_automatic(args: argparse.Namespace, api: GitHubAPI, client: Any, prior:
 
     result = run_auto(api, client, model=args.model, revision=args.revision,
                       investigation=prior, stop_after=args.stop_after,
-                      max_tool_calls=args.max_tool_calls)
+                      max_tool_calls=args.max_tool_calls,
+                      accept_needs_review=args.accept_needs_review)
     args.run_record.write_text(json.dumps(result.record(), indent=2), encoding="utf-8")
     print(f"Status: {result.status} (stage: {result.stage})")
     if result.detail:

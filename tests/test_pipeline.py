@@ -174,6 +174,23 @@ def test_patch_generation_failures_fail_closed(plan, detail):
     assert result.patch is None and result.manifest is None
 
 
+def test_human_can_continue_past_needs_review_but_not_unsupported():
+    model = script(*ROWKIT_DISCOVERY, eligibility=classification(requires_design_decision=True))
+    api, _ = api_for(rowkit(), 12)
+    blocked = run_auto(api, model, stop_after="discovery")
+    assert blocked.status == NEEDS_REVIEW and blocked.eligibility["human_override"] is False
+
+    api, _ = api_for(rowkit(), 12)
+    model = script(*ROWKIT_DISCOVERY, eligibility=classification(requires_design_decision=True))
+    result = run_auto(api, model, stop_after="discovery", accept_needs_review=True)
+    assert result.status == STOPPED_SELECTED
+    assert result.eligibility["status"] == NEEDS_REVIEW and result.eligibility["human_override"] is True
+
+    api, _ = api_for(pixelui(), 1)
+    result = run_auto(api, ScriptedModel(), accept_needs_review=True)
+    assert result.status == UNSUPPORTED and result.eligibility["human_override"] is False
+
+
 def test_stop_after_eligibility_and_discovery():
     api, _ = api_for(rowkit(), 12)
     model = script()
