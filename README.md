@@ -1,4 +1,4 @@
-# IssuePilot V2 — AI-Assisted GitHub Bug Investigation
+# IssuePilot — AI-Assisted GitHub Bug Investigation (V3 Sandbox MVP)
 
 A small but genuine **agentic AI** project: an LLM can choose which **read-only GitHub API tools** to call, inspect an issue and related source context, and produce an evidence-backed investigation report. Unlike document Q&A / RAG, this demonstrates multi-step tool use and a bounded agent execution loop.
 
@@ -56,6 +56,29 @@ issuepilot "https://github.com/OWNER/REPO/issues/NUMBER" --model gpt-5-mini
 
 The default model, `gpt-5-mini`, supports Responses tool calling. GitHub unauthenticated rate limits may interrupt large investigations; `GITHUB_TOKEN` is optional. See [OpenAI function calling](https://developers.openai.com/api/docs/guides/function-calling) and [GitHub REST API](https://docs.github.com/en/rest).
 
+## V3 Optional Local Sandbox Patch Validation
+
+**Status:** Docker validation support is implemented, with automated offline tests. The first real Docker smoke test still needs to be performed on your Mac.
+
+The validator is **separate from the LLM investigation**. It requires human review, an actual `git diff` patch, and explicit `--approve`. V2's `patch-proposal.md` is a Markdown suggestion, **not** an executable diff. This MVP does not automatically create a patch from the proposal.
+
+```bash
+# Build the local runner image (internet is used to install its dependencies at build time).
+docker build -f sandbox/Dockerfile -t issuepilot-sandbox:v1 .
+
+# Smoke test: an intentionally failing baseline and corrected Python test.
+python -m issuepilot.sandbox \
+  --repo-dir examples/sandbox_fixture \
+  --patch examples/sandbox_fixture.patch \
+  --test pytest -q \
+  --approve \
+  --output validation-report.json
+```
+
+If working correctly, `validation-report.json` reports `patched_tests_passed`, with the baseline results and patched results included. Runtime Docker restrictions include no network, non-root user, read-only input mounts, Linux capability dropping, limits on CPU/memory/PIDs, and ephemeral scratch storage. Docker is not a hardened isolation boundary for malicious code. **Only test trusted, reviewed source code; use a disposable VM for untrusted code.**
+
+See [Sandbox setup, limitations, and manual validation](sandbox/README.md).
+
 ## V2 Source Intelligence
 
 1. The agent reads the issue and chooses evidence-gathering tools dynamically.
@@ -82,13 +105,15 @@ flowchart TD
     A -->|After investigation| R[Evidence-backed Markdown report]
     A --> L[Tool-call audit trace]
     R --> P[Optional draft-only patch proposal]
+    P --> H[Human review and real unified diff]
+    H --> D[Local Docker patch and pytest validation]
 ```
 
 ## Design choices
 
 - **One agent** rather than simulated multi-agent roles: one real tool loop is easier to verify.
 - **No RAG dependency**: this is explicitly about live API tool use, not vector-based document retrieval.
-- **Read-only**: the agent cannot post comments, open PRs, edit issues or execute shell commands. Patch suggestions are generated text files only.
+- **Read-only GitHub tools**: the Agent cannot post comments, open PRs or edit remote issues. Patch suggestions are generated text files only. The **separate opt-in sandbox** executes reviewed local Python tests inside Docker; it never writes to a remote repository.
 - **Evidence-aware**: links must come from tool results; the prompt tells the model to acknowledge uncertainty.
 - **Safety tradeoffs**: repository content is untrusted and may contain prompt injection. Prompt instructions and path limits reduce risk, but this MVP does not guarantee full prompt-injection resistance. Use only public repositories and review outputs.
 
@@ -114,7 +139,7 @@ A manual live run was completed on November 5, 2026 (US Pacific time), using the
 
 ## Suggested resume bullet (after live validation)
 
-> Developed an AI-assisted GitHub bug investigation agent using Python and OpenAI function calling, with bounded code search, AST-based symbol inspection, and source-linked root-cause hypotheses; added execution traces, CI tests, and optional draft patch proposals.
+> Developed an AI-assisted GitHub bug investigation agent using Python and OpenAI function calling, featuring bounded code search, AST symbol inspection, and source-linked diagnoses; added a manually approved local Docker patch-validation workflow with pytest and structured test results.
 
 ## Development
 

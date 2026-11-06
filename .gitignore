@@ -225,3 +225,6 @@ tool-trace.json
 
 # Optional IssuePilot draft output (never auto-published)
 patch-proposal.md
+
+# Local optional Docker validation results
+validation-report.json
