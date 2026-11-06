@@ -10,7 +10,7 @@ A small but genuine **agentic AI** project: an LLM can choose which **read-only 
 - Five read-only tools: `get_issue`, `get_issue_comments`, `list_repository_files`, `read_repository_file`, `find_related_issues`.
 - Restricts investigation to the requested repository; rejects path traversal and secret-like file paths.
 - Adds budgets (6 exploratory model rounds, 12 tool calls), caches repeated tool requests, and forces a final synthesis with tools disabled when a budget is reached. Reports and safe tool-call audit JSON are saved locally.
-- Mocked integration tests for API adapter and agent orchestration; no API key needed for tests.
+- Automated offline tests for the GitHub API adapter, agent orchestration, safety controls, and budget handling; no API key needed for tests.
 
 ## Setup
 
@@ -23,7 +23,7 @@ pip install -e '.[dev]'
 pytest -q
 ```
 
-Automated tests use mocked external services, including regression tests for tool-budget exhaustion. A separate live end-to-end test is required to validate behavior against real OpenAI and GitHub APIs.
+Automated tests use mocked external services to make CI deterministic and independent of credentials. A separate manual end-to-end run has also been completed against the live OpenAI and GitHub APIs; see the evaluation notes below.
 
 ## Run on a public GitHub issue
 
@@ -65,18 +65,29 @@ flowchart TD
 
 ## Design choices
 
-- **One agent** rather than fake "multi-agent" roles: one real tool loop is easier to verify.
+- **One agent** rather than simulated multi-agent roles: one real tool loop is easier to verify.
 - **No RAG dependency**: this is explicitly about live API tool use, not vector-based document retrieval.
 - **Read-only**: the agent cannot post comments, open PRs, edit issues or execute shell commands.
 - **Evidence-aware**: links must come from tool results; the prompt tells the model to acknowledge uncertainty.
 - **Safety tradeoffs**: repository content is untrusted and may contain prompt injection. Prompt instructions and path limits reduce risk, but this MVP does not guarantee full prompt-injection resistance. Use only public repositories and review outputs.
 
-## Evaluation checklist (complete after a real run)
+## End-to-end validation
 
-- [ ] Run 3 issues across at least 2 public repositories; save manually reviewed conclusions.
-- [ ] Confirm that the report cites real issue/source links; record any unsupported claim.
-- [ ] Measure tool-call counts, tokens, latency and execution errors.
-- [ ] Note limitations and compare against a baseline one-shot summarization prompt.
+A manual live run was completed on November 5, 2026 (US Pacific time), using the project's default OpenAI model and a public GitHub issue:
+
+- **Test case:** [pallets/itsdangerous issue #429](https://github.com/pallets/itsdangerous/issues/429), about `URLSafeSerializer.loads` silently accepting an unexpected `max_age` parameter.
+- **Observed execution:** The real API-backed CLI returned a structured Markdown investigation report, with GitHub source/issue links, after **6 tool calls**.
+- **Outcome:** **Live integration exercised; investigation was `budget_limited`**, not a fully completed root-cause validation.
+- **Human review:** The report identified the permissive `Serializer.loads(**kwargs)` signature, but its suggestion to forward `max_age` into `load_payload()` is **not a justified fix**. Inspecting [`timed.py`](https://github.com/pallets/itsdangerous/blob/main/src/itsdangerous/timed.py) shows expiry is checked by `TimestampSigner.unsign(max_age=...)` in the timed serializer path, rather than by payload decoding. The untimed serializer should instead reject or explicitly handle unsupported arguments; the appropriate compatibility-preserving design requires further review.
+- **Evaluation caveat:** Live execution validates the model/API/tool integration and report generation, **not the correctness of every recommendation**. No tests or patch were run against the target repo.
+
+### Next evaluation milestones
+
+- [x] Run one real public issue with the OpenAI API and GitHub API.
+- [x] Inspect the resulting report and identify a substantive unsupported recommendation.
+- [ ] Run at least two further issues across another public repository.
+- [ ] Review `tool-trace.json` for exact call sequence, failures, and token usage; record latency.
+- [ ] Compare against a one-shot issue summarization baseline and score evidence grounding and proposed fixes.
 
 **Do not put a made-up accuracy number or claim production deployment in a resume.**
 
