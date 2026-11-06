@@ -9,7 +9,7 @@ A small but genuine **agentic AI** project: an LLM can choose which **read-only 
 - Uses the **OpenAI Responses API** with an actual multi-turn **function-calling loop** (not a hard-coded fetch → summarize chain).
 - Five read-only tools: `get_issue`, `get_issue_comments`, `list_repository_files`, `read_repository_file`, `find_related_issues`.
 - Restricts investigation to the requested repository; rejects path traversal and secret-like file paths.
-- Adds budgets (8 model rounds, 14 tool calls), truncates fetched content, outputs report and safe tool-call audit JSON.
+- Adds budgets (6 exploratory model rounds, 12 tool calls), caches repeated tool requests, and forces a final synthesis with tools disabled when a budget is reached. Reports and safe tool-call audit JSON are saved locally.
 - Mocked integration tests for API adapter and agent orchestration; no API key needed for tests.
 
 ## Setup
@@ -23,7 +23,7 @@ pip install -e '.[dev]'
 pytest -q
 ```
 
-The tests exercise fake GitHub responses and a fake LLM function call, so they do **not** prove that live network/API calls work.
+Automated tests use mocked external services, including regression tests for tool-budget exhaustion. A separate live end-to-end test is required to validate behavior against real OpenAI and GitHub APIs.
 
 ## Run on a public GitHub issue
 
@@ -36,7 +36,7 @@ export GITHUB_TOKEN="..."
 issuepilot "https://github.com/OWNER/REPO/issues/NUMBER"
 ```
 
-Use a real, public **Issue** URL (not a pull request). The tool creates `investigation.md` and `tool-trace.json` locally. Both are ignored by Git to avoid accidentally publishing content. The trace contains tool names and arguments but no raw fetched code.
+Use a real, public **Issue** URL (not a pull request). The tool creates `investigation.md` and `tool-trace.json` locally. The trace includes a `status` field: `completed` or `budget_limited`. A budget-limited report is provisional and should not be treated as a verified fix. Both are ignored by Git to avoid accidentally publishing content. The trace contains tool names and arguments but no raw fetched code.
 
 You may override the model:
 
@@ -90,6 +90,6 @@ flowchart TD
 pytest -q
 ```
 
-The repository includes a GitHub Actions workflow that executes the offline test suite on push and pull requests. A live model run requires an OpenAI API key, GitHub API connectivity, and separate API billing; it has **not** been validated in CI.
+The repository includes a GitHub Actions workflow that executes the offline test suite on push and pull requests. The exploratory loop has an explicit termination mechanism: when it reaches the round or tool budget, one final OpenAI request with `tool_choice="none"` synthesizes the evidence. A live model run requires an OpenAI API key, GitHub API connectivity, and separate API billing; it has **not** been validated in CI.
 
 Never paste a GitHub token or OpenAI key into a chat or commit it into Git.
