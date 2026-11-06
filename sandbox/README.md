@@ -18,7 +18,6 @@ The image includes Python 3.12, Git, pytest, and freezegun. It does **not** inst
 python -m issuepilot.sandbox \
   --repo-dir examples/sandbox_fixture \
   --patch examples/sandbox_fixture.patch \
-  --test pytest -q \
   --approve \
   --output validation-report.json
 ```
@@ -36,7 +35,6 @@ Expected: `patched_tests_passed`, with a failing baseline and passing patched te
 python -m issuepilot.sandbox \
   --repo-dir /absolute/path/to/trusted/python/repo \
   --patch /absolute/path/to/reviewed-change.patch \
-  --test pytest -q \
   --approve
 ```
 
