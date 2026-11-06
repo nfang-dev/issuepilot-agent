@@ -164,6 +164,38 @@ class GitHubAPI:
             return {"error": "Cannot decode Python source"}
         return inspect_python_symbols(content, path, symbol, raw.get("html_url", ""))
 
+    def get_repository_revision(self) -> str:
+        """Pin model inputs to one immutable commit, not a moving branch."""
+        metadata = self._get(self.prefix)
+        branch = metadata["default_branch"]
+        commit = self._get(f"{self.prefix}/commits/{quote(branch, safe='')}")
+        sha = commit["sha"]
+        if not re.fullmatch(r"[a-f0-9]{40}", sha):
+            raise ValueError("GitHub returned an invalid commit SHA")
+        return sha
+
+    def read_source_at_revision(self, path: str, revision: str) -> str:
+        """Fetch a *complete* permitted Python source file at a pinned commit.
+
+        Unlike the exploration tool, no truncation is allowed for patch generation.
+        """
+        if not allowed_path(path) or not path.endswith(".py"):
+            raise ValueError("Patch generation supports permitted .py files only")
+        if not re.fullmatch(r"[a-f0-9]{40}", revision):
+            raise ValueError("Expected an immutable 40-character Git commit SHA")
+        raw = self._get(f"{self.prefix}/contents/{quote(path, safe='/')}", ref=revision)
+        if raw.get("type") != "file" or raw.get("size", 0) > 24_000:
+            raise ValueError(f"File exceeds 24KB source limit: {path}")
+        if raw.get("encoding") != "base64":
+            raise ValueError(f"Unsupported GitHub encoding: {path}")
+        try:
+            source = base64.b64decode(raw["content"]).decode("utf-8")
+        except (UnicodeError, ValueError) as exc:
+            raise ValueError(f"Invalid UTF-8 source file: {path}") from exc
+        if len(source.encode("utf-8")) > 24_000 or not source.endswith("\n"):
+            raise ValueError(f"Source is too large or lacks final newline: {path}")
+        return source
+
     def find_related_issues(self, query: str) -> list[dict]:
         cleaned = " ".join(re.findall(r"[a-zA-Z0-9_.-]+", query))[:130]
         if not cleaned:

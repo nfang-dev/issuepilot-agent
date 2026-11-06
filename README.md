@@ -1,8 +1,8 @@
-# IssuePilot — AI-Assisted GitHub Bug Investigation (V3 Sandbox MVP)
+# IssuePilot — AI-Assisted GitHub Bug Investigation (V4 Source-grounded Patch Drafts)
 
 A small but genuine **agentic AI** project: an LLM can choose which **read-only GitHub API tools** to call, inspect an issue and related source context, and produce an evidence-backed investigation report. Unlike document Q&A / RAG, this demonstrates multi-step tool use and a bounded agent execution loop.
 
-> **Scope:** MVP, not a production bug-fixing system. Reports contain hypotheses, not verified fixes. No GitHub write permissions or shell/code execution. Do not run on private employer repositories without authorization.
+> **Scope:** MVP, not a production bug-fixing system. Reports contain hypotheses, not verified fixes. No GitHub write operations; reviewed local tests run only via the separate opt-in Docker sandbox. Do not run on private employer repositories without authorization.
 
 ## Capabilities
 
@@ -56,11 +56,45 @@ issuepilot "https://github.com/OWNER/REPO/issues/NUMBER" --model gpt-5-mini
 
 The default model, `gpt-5-mini`, supports Responses tool calling. GitHub unauthenticated rate limits may interrupt large investigations; `GITHUB_TOKEN` is optional. See [OpenAI function calling](https://developers.openai.com/api/docs/guides/function-calling) and [GitHub REST API](https://docs.github.com/en/rest).
 
+## V4 Source-grounded Patch Generation (real `git diff`)
+
+**Status:** This feature is implemented with offline tests. Running it against a real GitHub issue still requires your own live OpenAI API call and human review; no verified real-world fix is claimed.
+
+Unlike the earlier Markdown-only `patch-proposal.md`, this separate CLI fetches the **full text** of selected Python source and test files at a **single immutable GitHub commit**, asks the model for exact anchored replacements, refuses fabricated/ambiguous source snippets, checks Python syntax, and deterministically renders an actual **unified Git diff**. It also generates a SHA-256 manifest to verify the exact local checkout and patch before Docker execution.
+
+```bash
+python -m issuepilot.patch_generator \
+  "https://github.com/pallets/itsdangerous/issues/429" \
+  --files src/itsdangerous/serializer.py src/itsdangerous/timed.py tests/test_itsdangerous/test_serializer.py \
+  --investigation investigation.md
+```
+
+Outputs are `issuepilot-fix.patch` (a genuine draft diff) and `issuepilot-patch-manifest.json` (pinned revision and hashes). **This is still an unverified LLM proposal** and may be rejected if the model uses non-existent text. Failure to generate a diff is safer than inventing one. The tool never runs or applies the diff; it doesn't write to GitHub.
+
+Clone the *public target project* separately and check out the **exact commit printed by the generator**:
+
+```bash
+git clone https://github.com/pallets/itsdangerous.git ../itsdangerous
+cd ../itsdangerous
+git checkout YOUR_PRINTED_40_CHARACTER_COMMIT_SHA
+cd ../issuepilot-agent
+
+# Only after reading and approving issuepilot-fix.patch:
+python -m issuepilot.sandbox \
+  --repo-dir ../itsdangerous \
+  --patch issuepilot-fix.patch \
+  --manifest issuepilot-patch-manifest.json \
+  --approve \
+  --output validation-report.json
+```
+
+Docker checks the pinned SHA-256 source contents and patch hash *before* execution. It reports baseline and patched tests separately. A passing run does **not** prove the bug is fixed, unless a relevant regression test demonstrably fails before and passes after. Existing tests alone are not sufficient; model-generated regression tests also require review. Never automatically run arbitrary code from unknown repositories; use a disposable VM for malicious/untrusted code.
+
 ## V3 Optional Local Sandbox Patch Validation
 
-**Status:** Docker validation support is implemented, with automated offline tests. The first real Docker smoke test still needs to be performed on your Mac.
+**Status:** Docker validation support is implemented, with offline tests. A manual Docker fixture smoke test ran successfully on a Mac: the baseline had 1 failing test, and the patched version passed all 3. This establishes the sample workflow, not the correctness of an AI-produced real bug fix.
 
-The validator is **separate from the LLM investigation**. It requires human review, an actual `git diff` patch, and explicit `--approve`. V2's `patch-proposal.md` is a Markdown suggestion, **not** an executable diff. This MVP does not automatically create a patch from the proposal.
+The validator is **separate from the LLM investigation**. It requires human review, an actual `git diff` patch, and explicit `--approve`. V2's `patch-proposal.md` is a Markdown suggestion, **not** an executable diff. The new V4 `issuepilot.patch_generator` separately creates a real diff from exact GitHub sources, but only from explicitly selected files and with a manual approval boundary.
 
 ```bash
 # Build the local runner image (internet is used to install its dependencies at build time).
@@ -104,7 +138,9 @@ flowchart TD
     A -->|After investigation| R[Evidence-backed Markdown report]
     A --> L[Tool-call audit trace]
     R --> P[Optional draft-only patch proposal]
-    P --> H[Human review and real unified diff]
+    P --> H[Human review]
+    R --> Q[V4 pinned source and exact-edit patch generator]
+    Q --> H
     H --> D[Local Docker patch and pytest validation]
 ```
 
@@ -130,6 +166,8 @@ A manual live run was completed on November 5, 2026 (US Pacific time), using the
 
 - [x] Run one real public issue with the OpenAI API and GitHub API.
 - [x] Inspect the resulting report and identify a substantive unsupported recommendation.
+- [ ] Generate a real source-grounded patch for issue #429 and manually verify its claims.
+- [ ] Run source-pinned Docker validation on that reviewed patch with a regression test.
 - [ ] Run at least two further issues across another public repository.
 - [ ] Review `tool-trace.json` for exact call sequence, failures, and token usage; record latency.
 - [ ] Compare against a one-shot issue summarization baseline and score evidence grounding and proposed fixes.

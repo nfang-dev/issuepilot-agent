@@ -41,3 +41,18 @@ python -m issuepilot.sandbox \
 **Safety and limits:** The host launcher rejects non-diff input and stages only bounded, allowlisted, non-symlink source files. At runtime mounts are read-only. The container uses a non-root user, disabled network, dropped capabilities, resource limits, and temporary scratch storage. Docker is **not** a strong security boundary for malicious code. Review code first; for genuinely adversarial workloads, prefer a disposable VM. The Docker image build itself uses standard network and privileged image-building operations. Do not put credentials in test source code.
 
 **Out of scope:** arbitrary build commands, installation of target-specific dependencies, fully automated patch generation, PRs, comprehensive repository checkout, and production-grade security. The launcher does not write to any GitHub repository.
+
+
+## V4 source provenance
+
+The separate generator (`python -m issuepilot.patch_generator`) outputs `issuepilot-fix.patch` and `issuepilot-patch-manifest.json`. After inspecting the diff, validate them against a trusted checkout pinned to the generated `base_commit`:
+
+```bash
+python -m issuepilot.sandbox \
+  --repo-dir ../itsdangerous \
+  --patch issuepilot-fix.patch \
+  --manifest issuepilot-patch-manifest.json \
+  --approve
+```
+
+When a manifest is supplied, the sandbox checks that all selected source files match the SHA-256 values fetched from GitHub, the diff hash is unchanged, and Git checkout HEAD (when available) matches the pinned revision. Any mismatch is rejected **before** Docker execution. This does not make a model-proposed fix correct or the container a hardened security boundary. Review model-generated edits and tests.

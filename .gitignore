@@ -228,3 +228,7 @@ patch-proposal.md
 
 # Local optional Docker validation results
 validation-report.json
+
+# Generated V4 drafts and metadata
+issuepilot-fix.patch
+issuepilot-patch-manifest.json
