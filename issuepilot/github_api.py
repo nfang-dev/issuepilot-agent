@@ -9,6 +9,8 @@ from urllib.parse import quote
 
 import requests
 
+from issuepilot.code_intelligence import find_text_matches, inspect_python_symbols, rank_file_paths
+
 ISSUE_RE = re.compile(r"^https://github\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)/issues/([1-9][0-9]*)(?:/)?(?:[?#].*)?$")
 ALLOWED_SUFFIXES = {".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".java", ".md", ".json", ".toml", ".yaml", ".yml", ".rs", ".cpp", ".h"}
 
@@ -108,6 +110,59 @@ class GitHubAPI:
         except (UnicodeDecodeError, ValueError):
             return {"error": "File cannot be read as UTF-8"}
         return {"path": path, "content": content[:14_000], "url": raw.get("html_url"), "truncated": len(content) > 14_000}
+
+    def search_repository_code(self, query: str, path_prefix: str) -> dict:
+        """Bounded source text search across selected files in this repository.
+
+        It is not GitHub's global code search or a complete repository index.
+        """
+        if not 2 <= len(query.strip()) <= 100:
+            return {"error": "query length must be 2-100 characters"}
+        if len(path_prefix) > 120 or ".." in path_prefix or path_prefix.startswith(("/", ".")):
+            return {"error": "invalid path prefix"}
+        if self._paths is None:
+            self.list_repository_files("")
+        candidates = rank_file_paths(self._paths or [], query, path_prefix)
+        matches: list[dict] = []
+        files_scanned = 0
+        for path in candidates[:18]:
+            try:
+                file = self.read_repository_file(path)
+            except requests.RequestException:
+                continue
+            if "error" in file:
+                continue
+            files_scanned += 1
+            matches.extend(find_text_matches(file["content"], query, file.get("url", ""), path))
+            if len(matches) >= 12:
+                break
+        return {
+            "query": query,
+            "matches": matches[:12],
+            "files_scanned": files_scanned,
+            "candidate_files": len(candidates),
+            "partial_search": len(candidates) > files_scanned or getattr(self, "_tree_truncated", False),
+            "note": "Best-effort search of up to 18 files and first 14KB of each file. No hits does not mean code is absent.",
+        }
+
+    def inspect_python_symbol(self, path: str, symbol: str) -> dict:
+        """Read one Python file and extract AST definitions and calls without executing it."""
+        if not allowed_path(path) or not path.endswith(".py"):
+            return {"error": "Only permitted Python source files may be inspected"}
+        if self._paths is None:
+            self.list_repository_files("")
+        if path not in (self._paths or []):
+            return {"error": "File was not found in the repository tree"}
+        raw = self._get(f"{self.prefix}/contents/{quote(path, safe='/')}")
+        if raw.get("type") != "file" or raw.get("size", 0) > 40_000:
+            return {"error": "Python source file exceeds 40KB cap"}
+        if raw.get("encoding") != "base64":
+            return {"error": "Unsupported file encoding"}
+        try:
+            content = base64.b64decode(raw["content"]).decode("utf-8")
+        except (UnicodeError, ValueError):
+            return {"error": "Cannot decode Python source"}
+        return inspect_python_symbols(content, path, symbol, raw.get("html_url", ""))
 
     def find_related_issues(self, query: str) -> list[dict]:
         cleaned = " ".join(re.findall(r"[a-zA-Z0-9_.-]+", query))[:130]

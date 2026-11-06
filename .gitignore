@@ -222,3 +222,6 @@ __marimo__/
 # Local agent reports
 investigation.md
 tool-trace.json
+
+# Optional IssuePilot draft output (never auto-published)
+patch-proposal.md
