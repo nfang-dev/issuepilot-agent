@@ -123,3 +123,49 @@ class EmptyResponses:
 def test_agent_rejects_answer_without_tools():
     with pytest.raises(RuntimeError, match='without using any tools'):
         investigate(GitHubAPI(IssueRef('demo','app',7), session=FakeSession()), NS(responses=EmptyResponses()))
+
+
+class AlwaysCallsResponses:
+    """Model keeps requesting a source file; final answer must be forced."""
+    def __init__(self):
+        self.requests = []
+
+    def create(self, **kwargs):
+        self.requests.append(kwargs)
+        if kwargs.get("tool_choice") == "none":
+            return NS(output=[NS(type="message")],
+                      usage=NS(input_tokens=40, output_tokens=100),
+                      output_text="## Issue Summary\nBudget-limited investigation.\n"
+                                  "## Evidence\nhttps://github.com/demo/app/issues/7\n"
+                                  "## Root Cause Hypotheses\nUnverified.\n"
+                                  "## Suggested Next Steps\nReproduce.\n"
+                                  "## Limitations\nNot confirmed.")
+        name = "get_issue" if len(self.requests) == 1 else "list_repository_files"
+        arguments = '{}' if name == "get_issue" else '{"path_prefix": ""}'
+        return NS(output=[NS(type="function_call", name=name,
+                             arguments=arguments, call_id=f"c{len(self.requests)}")],
+                  usage=NS(input_tokens=60, output_tokens=10),
+                  output_text="")
+
+
+def test_budget_limit_forces_final_report():
+    responses = AlwaysCallsResponses()
+    api = GitHubAPI(IssueRef('demo', 'app', 7), session=FakeSession())
+    outcome = investigate(api, NS(responses=responses), max_rounds=3)
+    assert outcome.status == "budget_limited"
+    assert len(responses.requests) == 4
+    assert responses.requests[-1]["tool_choice"] == "none"
+    assert len(outcome.tool_calls) == 3
+    assert outcome.tool_calls[-1]["cached"] is True
+    assert "Limitations" in outcome.report
+    assert outcome.usage == {"input_tokens": 220, "output_tokens": 130}
+
+
+def test_tool_budget_forces_final_report():
+    responses = AlwaysCallsResponses()
+    api = GitHubAPI(IssueRef('demo', 'app', 7), session=FakeSession())
+    outcome = investigate(api, NS(responses=responses), max_rounds=8, max_tool_calls=2)
+    assert outcome.status == "budget_limited"
+    assert len(outcome.tool_calls) == 2
+    assert len(responses.requests) == 3
+    assert responses.requests[-1]["tool_choice"] == "none"
