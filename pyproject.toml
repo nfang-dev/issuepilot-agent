@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "issuepilot-agent"
+version = "0.1.0"
+description = "A read-only GitHub issue investigation agent with real LLM tool calling"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["openai>=1.80", "requests>=2.31"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+issuepilot = "issuepilot.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["issuepilot*"]

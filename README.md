@@ -1,2 +1,95 @@
-# issuepilot-agent
-An AI-powered GitHub issue investigation agent that uses LLM tool calling to explore repositories, analyze issues, and generate evidence-backed root cause hypotheses and fix recommendations.
+# IssuePilot — GitHub Issue Investigation Agent
+
+A small but genuine **agentic AI** project: an LLM can choose which **read-only GitHub API tools** to call, inspect an issue and related source context, and produce an evidence-backed investigation report. Unlike document Q&A / RAG, this demonstrates multi-step tool use and a bounded agent execution loop.
+
+> **Scope:** MVP, not a production bug-fixing system. Reports contain hypotheses, not verified fixes. No GitHub write permissions or shell/code execution. Do not run on private employer repositories without authorization.
+
+## Capabilities
+
+- Uses the **OpenAI Responses API** with an actual multi-turn **function-calling loop** (not a hard-coded fetch → summarize chain).
+- Five read-only tools: `get_issue`, `get_issue_comments`, `list_repository_files`, `read_repository_file`, `find_related_issues`.
+- Restricts investigation to the requested repository; rejects path traversal and secret-like file paths.
+- Adds budgets (8 model rounds, 14 tool calls), truncates fetched content, outputs report and safe tool-call audit JSON.
+- Mocked integration tests for API adapter and agent orchestration; no API key needed for tests.
+
+## Setup
+
+Requires Python 3.10+.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e '.[dev]'
+pytest -q
+```
+
+The tests exercise fake GitHub responses and a fake LLM function call, so they do **not** prove that live network/API calls work.
+
+## Run on a public GitHub issue
+
+Get an OpenAI API key with Responses API access. This **incurs API charges**; ChatGPT subscriptions are billed separately.
+
+```bash
+export OPENAI_API_KEY="..."  # configure in your shell only; never commit keys
+# Optional: authenticated GitHub REST API limits (read-only permissions)
+export GITHUB_TOKEN="..."
+issuepilot "https://github.com/OWNER/REPO/issues/NUMBER"
+```
+
+Use a real, public **Issue** URL (not a pull request). The tool creates `investigation.md` and `tool-trace.json` locally. Both are ignored by Git to avoid accidentally publishing content. The trace contains tool names and arguments but no raw fetched code.
+
+You may override the model:
+
+```bash
+issuepilot "https://github.com/OWNER/REPO/issues/NUMBER" --model gpt-5-mini
+```
+
+The default model, `gpt-5-mini`, supports Responses tool calling. GitHub unauthenticated rate limits may interrupt large investigations; `GITHUB_TOKEN` is optional. See [OpenAI function calling](https://developers.openai.com/api/docs/guides/function-calling) and [GitHub REST API](https://docs.github.com/en/rest).
+
+## Architecture
+
+```mermaid
+flowchart TD
+    U[GitHub issue URL] --> A[LLM investigator]
+    A -->|Tool selection| T{Read-only tools}
+    T --> I[Issue and comments]
+    T --> F[Repository tree and source files]
+    T --> S[Related issues search]
+    I --> G[GitHub REST API]
+    F --> G
+    S --> G
+    G -->|Tool results| A
+    A -->|After investigation| R[Evidence-backed Markdown report]
+    A --> L[Tool-call audit trace]
+```
+
+## Design choices
+
+- **One agent** rather than fake "multi-agent" roles: one real tool loop is easier to verify.
+- **No RAG dependency**: this is explicitly about live API tool use, not vector-based document retrieval.
+- **Read-only**: the agent cannot post comments, open PRs, edit issues or execute shell commands.
+- **Evidence-aware**: links must come from tool results; the prompt tells the model to acknowledge uncertainty.
+- **Safety tradeoffs**: repository content is untrusted and may contain prompt injection. Prompt instructions and path limits reduce risk, but this MVP does not guarantee full prompt-injection resistance. Use only public repositories and review outputs.
+
+## Evaluation checklist (complete after a real run)
+
+- [ ] Run 3 issues across at least 2 public repositories; save manually reviewed conclusions.
+- [ ] Confirm that the report cites real issue/source links; record any unsupported claim.
+- [ ] Measure tool-call counts, tokens, latency and execution errors.
+- [ ] Note limitations and compare against a baseline one-shot summarization prompt.
+
+**Do not put a made-up accuracy number or claim production deployment in a resume.**
+
+## Suggested resume bullet (after live validation)
+
+> Developed a GitHub issue investigation agent using Python, OpenAI function calling, and five read-only GitHub tools to dynamically inspect issues, source files, and related discussions, generating evidence-backed root-cause hypotheses with bounded tool execution.
+
+## Development
+
+```bash
+pytest -q
+```
+
+The repository includes a GitHub Actions workflow that executes the offline test suite on push and pull requests. A live model run requires an OpenAI API key, GitHub API connectivity, and separate API billing; it has **not** been validated in CI.
+
+Never paste a GitHub token or OpenAI key into a chat or commit it into Git.
