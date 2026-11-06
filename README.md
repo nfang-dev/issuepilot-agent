@@ -70,7 +70,6 @@ docker build -f sandbox/Dockerfile -t issuepilot-sandbox:v1 .
 python -m issuepilot.sandbox \
   --repo-dir examples/sandbox_fixture \
   --patch examples/sandbox_fixture.patch \
-  --test pytest -q \
   --approve \
   --output validation-report.json
 ```
