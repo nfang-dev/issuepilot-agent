@@ -263,6 +263,24 @@ def test_cli_rejects_invalid_option_combinations(cli, argv):
     assert exc.value.code == 2
 
 
+def test_cli_stop_after_ignores_existing_patch_outputs(cli, tmp_path):
+    cli(rowkit(), script(*ROWKIT_DISCOVERY))
+    (tmp_path / "issuepilot-fix.patch").write_text("previous draft")
+    (tmp_path / "issuepilot-patch-manifest.json").write_text("{}")
+    pg.main(["https://github.com/acme/rowkit/issues/12", "--stop-after", "discovery"])
+    record = json.loads((tmp_path / "issuepilot-run.json").read_text())
+    assert record["status"] == STOPPED_SELECTED
+    assert (tmp_path / "issuepilot-fix.patch").read_text() == "previous draft"  # untouched
+
+
+def test_cli_stop_after_still_protects_the_run_record(cli, tmp_path):
+    cli(rowkit(), ScriptedModel())
+    (tmp_path / "issuepilot-run.json").write_text("{}")
+    with pytest.raises(SystemExit) as exc:
+        pg.main(["https://github.com/acme/rowkit/issues/12", "--stop-after", "eligibility"])
+    assert exc.value.code == 2
+
+
 def test_cli_refuses_to_overwrite_outputs(cli, tmp_path):
     cli(rowkit(), ScriptedModel())
     (tmp_path / "issuepilot-run.json").write_text("{}")

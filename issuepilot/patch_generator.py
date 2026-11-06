@@ -234,7 +234,9 @@ def main(argv: list[str] | None = None) -> None:
     outputs = [args.output, args.manifest] + ([args.run_record] if auto else [])
     if len({path.resolve() for path in outputs}) != len(outputs):
         parser.error("Patch, manifest and run-record outputs must have distinct file paths")
-    if not args.overwrite and any(path.exists() for path in outputs):
+    # --stop-after never writes a patch or manifest, so only the run record can collide.
+    written = [args.run_record] if auto and args.stop_after else outputs
+    if not args.overwrite and any(path.exists() for path in written):
         parser.error("An output file already exists; change the paths or pass --overwrite")
     if not auto and (args.stop_after or args.max_tool_calls is not None):
         parser.error("--stop-after and --max-tool-calls apply only without --files")
