@@ -150,6 +150,7 @@ def test_manifest_rejects_tampering_or_wrong_checkout(tmp_path):
     with pytest.raises(ValueError, match="Patch SHA256"):
         verify_patch_manifest(manifest, patch_path, staged, source)
     patch_path.write_text(patch)
+    (staged / "src" / "serializer.py").chmod(0o600)
     (staged / "src" / "serializer.py").write_text("corrupt")
     with pytest.raises(ValueError, match="revision mismatch"):
         verify_patch_manifest(manifest, patch_path, staged, source)
