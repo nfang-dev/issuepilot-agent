@@ -59,7 +59,7 @@ The default model, `gpt-5-mini`, supports Responses tool calling. GitHub unauthe
 
 ## V5 URL-only Draft Fixes (automatic eligibility + file discovery)
 
-**Status:** Implemented with deterministic offline tests on synthetic projects and a scripted model. **The automatic pipeline has not yet been run against a live model or a real GitHub issue**, so no real-world repair, discovery accuracy or success rate is claimed.
+**Status:** Implemented with deterministic offline tests on synthetic projects and a scripted model, plus **one** live end-to-end run on a real issue (below). One run is a case study, not a success rate; no general discovery accuracy or repair rate is claimed.
 
 ```bash
 python -m issuepilot.patch_generator "https://github.com/OWNER/REPO/issues/NUMBER"
@@ -109,6 +109,22 @@ Rejected submissions go back to the model with concrete problems (max 3 attempts
 `--accept-needs-review` lets a human continue past an eligibility `needs_review` (never past `unsupported`); the run record marks it as `human_override: true`. `--revision SHA` pins every stage to an explicit commit (for example the parent of a known fix, for evaluation against closed issues). The manifest keeps `schema_version: 1`, so the existing sandbox provenance check works unchanged.
 
 **What the tests cover.** `tests/synthetic_github.py` serves several synthetic projects (src layout, flat layout with nested tests, a C++-backed extension, a JavaScript repo, a mixed-language repo) through a fake GitHub REST API with commit-addressable trees. Scripted model replies drive unsupported and needs-review paths, wrong file selections, tool- and round-budget exhaustion, GitHub failures, unsafe tool arguments, generator failures, branch movement mid-run, and the CLI. Two end-to-end tests apply the generated diff to a local copy of a synthetic project and show its regression test failing before and passing after the source change. These validate the pipeline mechanics when the model proposes the right edit; they are **not** evidence of live model quality.
+
+### Live run 1: pallets/itsdangerous #429 (gpt-5-mini, 2026-11-06)
+
+Issue: `URLSafeSerializer.loads(token, max_age=...)` silently ignores `max_age`, so a caller who picked the wrong serializer believes tokens expire when they do not. Pinned commit `672971d66a2ef9f85151e53283113f33d642dabd`.
+
+| Stage | What happened |
+| --- | --- |
+| Eligibility | `needs_review` in both runs, for different stated reasons (`requires_design_decision`, then `security_sensitive`). The fixed policy table kept the outcome stable while the model's wording varied. Continued with `--accept-needs-review` (recorded as `human_override: true`). |
+| Discovery | 7 of 14 exploration calls, first submission accepted. Selected `src/itsdangerous/serializer.py` (base `Serializer.loads` takes `**kwargs` and ignores them; `URLSafeSerializer` inherits it) and `tests/test_itsdangerous/test_url_safe.py`. ~59K input tokens. |
+| Comparison | The earlier manual V4 run used `serializer.py`, `timed.py`, `test_serializer.py`. Discovery agreed on the source file and did not need `timed.py`. |
+| Patch | `Serializer.loads` raises `TypeError` for unexpected keyword arguments; a regression test was added to `TestURLSafeSerializer`. |
+| Docker validation | Baseline 297 passed. Patched: 298 passed, **1 failed** (`patched_tests_failed`). |
+
+**Why it failed:** `TestURLSafeTimedSerializer` inherits from `TestURLSafeSerializer`, so the new test also ran against the timed serializer, which legitimately accepts `max_age`; `max_age=-1` raised `SignatureExpired` instead of `TypeError`. The source change broke none of the 297 existing tests, but the model-written regression test was placed in an inherited test class. The sandbox caught this; the draft was not treated as a fix.
+
+**Not yet shown:** a regression test that fails before and passes after the change, and whether maintainers would accept raising on unexpected keyword arguments (a compatibility decision).
 
 ## V4 Source-grounded Patch Generation (real `git diff`)
 
@@ -225,7 +241,8 @@ A manual live run was completed on November 5, 2026 (US Pacific time), using the
 - [ ] Generate a real source-grounded patch for issue #429 and manually verify its claims.
 - [ ] Run source-pinned Docker validation on that reviewed patch with a regression test.
 - [ ] Run at least two further issues across another public repository.
-- [ ] Run the V5 URL-only pipeline live on several public issues (including closed issues pinned with `--revision` to the commit before their fix); record eligibility decisions, selected files versus the files the real fix touched, and failure reasons.
+- [x] Run the V5 URL-only pipeline live end to end on one real issue with Docker validation (itsdangerous #429: correct source file, regression test misplaced; see above).
+- [ ] Run the V5 URL-only pipeline live on several more public issues (including closed issues pinned with `--revision` to the commit before their fix); record eligibility decisions, selected files versus the files the real fix touched, and failure reasons.
 - [ ] Review `tool-trace.json` for exact call sequence, failures, and token usage; record latency.
 - [ ] Compare against a one-shot issue summarization baseline and score evidence grounding and proposed fixes.
 
