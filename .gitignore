@@ -233,3 +233,4 @@ validation-report.json
 issuepilot-fix.patch
 issuepilot-patch-manifest.json
 issuepilot-run.json
+benchmark/checkouts/

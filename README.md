@@ -244,6 +244,7 @@ A manual live run was completed on November 5, 2026 (US Pacific time), using the
 - [ ] Run source-pinned Docker validation on that reviewed patch with a regression test.
 - [ ] Run at least two further issues across another public repository.
 - [x] Run the V5 URL-only pipeline live end to end on one real issue with Docker validation (itsdangerous #429: correct source file, regression test misplaced; see above).
+- [ ] Run the pre-registered [mini benchmark](benchmark/README.md) (10 fixed issues, 5 repositories) and publish every outcome.
 - [ ] Run the V5 URL-only pipeline live on several more public issues (including closed issues pinned with `--revision` to the commit before their fix); record eligibility decisions, selected files versus the files the real fix touched, and failure reasons.
 - [ ] Review `tool-trace.json` for exact call sequence, failures, and token usage; record latency.
 - [ ] Compare against a one-shot issue summarization baseline and score evidence grounding and proposed fixes.
