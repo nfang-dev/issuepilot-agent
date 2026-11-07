@@ -124,7 +124,9 @@ Issue: `URLSafeSerializer.loads(token, max_age=...)` silently ignores `max_age`,
 
 **Why it failed:** `TestURLSafeTimedSerializer` inherits from `TestURLSafeSerializer`, so the new test also ran against the timed serializer, which legitimately accepts `max_age`; `max_age=-1` raised `SignatureExpired` instead of `TypeError`. The source change broke none of the 297 existing tests, but the model-written regression test was placed in an inherited test class. The sandbox caught this; the draft was not treated as a fix.
 
-**Not yet shown:** a regression test that fails before and passes after the change, and whether maintainers would accept raising on unexpected keyword arguments (a compatibility decision).
+**Human-corrected follow-up:** [`examples/itsdangerous-429-corrected.patch`](examples/itsdangerous-429-corrected.patch) keeps the model's source change unchanged and only moves the regression test to a module-level function, so the timed test classes no longer inherit it. Checked locally at the pinned commit: the new test fails on the original source (`DID NOT RAISE TypeError`) and passes with the fix; timed serializers still accept `max_age`. Full-suite Docker validation of this corrected patch is pending. This correction was made by a human, not by IssuePilot.
+
+**Not yet shown:** whether maintainers would accept raising on unexpected keyword arguments (a compatibility decision).
 
 ## V4 Source-grounded Patch Generation (real `git diff`)
 

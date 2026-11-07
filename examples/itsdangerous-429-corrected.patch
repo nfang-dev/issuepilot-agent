@@ -1,0 +1,43 @@
+diff --git a/src/itsdangerous/serializer.py b/src/itsdangerous/serializer.py
+index 5ed949c..68d4de2 100644
+--- a/src/itsdangerous/serializer.py
++++ b/src/itsdangerous/serializer.py
+@@ -331,6 +331,20 @@ class Serializer(t.Generic[_TSerialized]):
+         """Reverse of :meth:`dumps`. Raises :exc:`.BadSignature` if the
+         signature validation fails.
+         """
++        # Fail fast for unexpected keyword arguments. Subclasses that accept
++        # keyword arguments (for example, timed serializers that accept
++        # ``max_age``) should override this method to accept them.
++        if kwargs:
++            if len(kwargs) == 1:
++                name = next(iter(kwargs))
++                raise TypeError(
++                    f"{self.__class__.__name__}.loads() got an unexpected keyword argument {name!r}"
++                )
++            names = ", ".join(repr(k) for k in kwargs)
++            raise TypeError(
++                f"{self.__class__.__name__}.loads() got unexpected keyword arguments {names}"
++            )
++
+         s = want_bytes(s)
+         last_exception = None
+ 
+diff --git a/tests/test_itsdangerous/test_url_safe.py b/tests/test_itsdangerous/test_url_safe.py
+index 37e4812..0bc0b9a 100644
+--- a/tests/test_itsdangerous/test_url_safe.py
++++ b/tests/test_itsdangerous/test_url_safe.py
+@@ -22,3 +22,13 @@ class TestURLSafeTimedSerializer(TestURLSafeSerializer, TestTimedSerializer):
+     @pytest.fixture()
+     def serializer_factory(self):
+         return partial(URLSafeTimedSerializer, secret_key="secret-key")
++
++
++def test_url_safe_serializer_rejects_unexpected_max_age():
++    # Module-level on purpose: the timed test classes inherit from
++    # TestURLSafeSerializer and legitimately accept max_age.
++    s = URLSafeSerializer(secret_key="secret-key")
++    token = s.dumps("value")
++
++    with pytest.raises(TypeError, match="max_age"):
++        s.loads(token, max_age=-1)
