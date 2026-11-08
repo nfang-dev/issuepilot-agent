@@ -34,6 +34,38 @@ python benchmark/score.py               # writes results/summary.md and summary.
 
 `run.py` clones each target repository into `benchmark/checkouts/` (git-ignored) and executes its tests inside the Docker sandbox. Results go to `benchmark/results/<case>/`.
 
+## Results: run 1 (2026-11-07, gpt-5-mini)
+
+Raw per-case artefacts are in [`results/`](results/) and the generated table is [`results/summary.md`](results/summary.md). Analysis below was added after reading every case's records; no case was re-run or relabelled.
+
+| Metric | Result | Note |
+| --- | --- | --- |
+| Eligibility accuracy | 7/8 | The one correct docs rejection (cachetools-395) came from the deterministic `docs` label rule, not the model |
+| Discovery source recall | 6/6 cases, mean 1.0 | Every gold source file was selected |
+| Gold test file selected | 5/6 | cachetools-405 chose `tests/test_lru.py`; upstream used the shared `tests/__init__.py` mixin |
+| Patch generated | 4/6 positives | Both failures failed closed (no patch written) |
+| Patch applies | 4/4 | |
+| Patched suite passes in Docker | 3/3 | Excludes dotenv-699 (baseline not clean) |
+| Regression validated in Docker | 3/3 | Draft's tests fail without the source change |
+| Mean discovery tool calls / tokens | 4.7 / ~50K | Per case, all stages |
+
+**Upstream-oracle check (added after the run, outside Docker).** For the 3 validated cases, the agent's *source* changes were applied without its tests, then the upstream fix's own tests were run (Python 3.13, plain pytest). Upstream tests fail on the original source and pass with the agent's change in all 3:
+
+| Case | Original source + upstream tests | Agent source + upstream tests | Agent fix vs upstream |
+| --- | --- | --- | --- |
+| cachetools-423 | 1 failed | 338 passed | Same approach (check emptiness before `choice`) |
+| cachetools-405 | 7 failed | 312 passed | Different implementation (adjusted eviction condition vs upstream's split insert/replace branches) |
+| pathspec-84 | 1 failed | 119 passed | Identical one-line change (`return bool(include)`) |
+
+**Failures, by root cause**
+
+- **dotenv-697: patch generator output budget.** The patch call used exactly 7,000 output tokens (the `max_output_tokens` cap), so the JSON was truncated and rejected. A real IssuePilot limitation with reasoning models; discovery had selected the gold file.
+- **pathspec-77: anchor not found.** The model's `old` text did not occur in the pinned source, so the generator refused to build a diff. The source-grounding check worked as designed; no fix was produced.
+- **dotenv-699: test environment.** python-dotenv's CLI tests spawn the installed `dotenv` executable, which the sandbox (plain checkout, no install) lacks: 15 tests fail on the unpatched baseline. Counted as infrastructure. Informally, the agent's new test (`test_get_empty_value`) was the only additional failure in the tests-only run and passed with the full patch, but this case is not counted as validated.
+- **semver-429: eligibility miss, rejected later.** The issue reports a bug in example code inside the docs; the classifier called it a `logic_bug`. Discovery then inspected the code and submitted `unsupported` ("the required change is to the .rst documentation"), so the run produced no patch. Scored as a miss for eligibility, as registered.
+
+**What this run supports:** on small, self-contained fixes, discovery located the right source file in every case it reached, and half of the bug cases ended with a Docker-validated draft whose source change also passes the upstream regression tests. **What it does not support:** any success rate beyond these 8 cases, or performance on large files, multi-file fixes, or fresh (unfixed) issues.
+
 ## Known limitations (declared up front)
 
 - 8 cases is a case study, not a statistically meaningful success rate.
