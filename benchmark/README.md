@@ -1,6 +1,6 @@
 # IssuePilot mini benchmark (pre-registered)
 
-A small, honest benchmark: 10 real, already-fixed GitHub issues from 5 Python repositories, run once each, with every outcome kept. It measures IssuePilot as it is; it does not tune IssuePilot to these cases.
+A small, honest benchmark: 8 real, already-fixed GitHub issues from 4 Python repositories, run once each, with every outcome kept. It measures IssuePilot as it is; it does not tune IssuePilot to these cases.
 
 ## Protocol
 
@@ -28,7 +28,7 @@ Every case gets one outcome: `validated`, `tests_failed`, `not_regression_valida
 export OPENAI_API_KEY=...  GITHUB_TOKEN=...
 docker build -f sandbox/Dockerfile -t issuepilot-sandbox:v1 .   # rebuild: image now includes click
 python benchmark/verify_cases.py        # issue numbers are issues, base = parent of fix
-python benchmark/run.py                 # ~10 cases; add --case ID to run one
+python benchmark/run.py                 # 8 cases; add --case ID to run one
 python benchmark/score.py               # writes results/summary.md and summary.json
 ```
 
@@ -36,8 +36,8 @@ python benchmark/score.py               # writes results/summary.md and summary.
 
 ## Known limitations (declared up front)
 
-- 10 cases is a case study, not a statistically meaningful success rate.
+- 8 cases is a case study, not a statistically meaningful success rate.
 - Closed issues: the issue text and comments are given to the model and may mention the eventual fix. This can make discovery easier than on a fresh issue.
-- Both humanize cases may fail at import in the sandbox (generated `_version.py` / `pkg_resources` metadata). These count as `infrastructure`, not agent failures, and are reported separately.
+- Two humanize cases were removed **before any live run** because pre-flight verification showed the fix commits' issue numbers do not match the current repository (#159 is a pull request). See `excluded_before_run` in `cases.json`. No replacements were added.
 - Regression validation only checks that the draft's tests fail without the source change; it does not prove they test the reported bug. Read the diffs.
 - The Docker image adds `click` (needed by python-dotenv's test fixtures). This is a generic test-environment dependency, not case-specific tuning.

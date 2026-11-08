@@ -5,89 +5,106 @@
   "gold_rule": "gold_source_files = non-test Python files changed by the upstream fix, excluding version-only bumps (pathspec/_meta.py). gold_test_files = test files changed by the upstream fix.",
   "cases": [
     {
-      "id": "dotenv-699", "repo": "theskumar/python-dotenv", "issue": 699,
+      "id": "dotenv-699",
+      "repo": "theskumar/python-dotenv",
+      "issue": 699,
       "category": "argument_validation_error_handling",
       "summary": "`dotenv get` exits 0 for empty string values",
       "fix_commit": "f215c0274dc4c310e5ca5feb4c6bddade25ece21",
       "base_commit": "58f2d7c112235b347040bb5cb579d4ebc0a0ad91",
       "expected_eligibility": "eligible",
-      "gold_source_files": ["src/dotenv/cli.py"],
-      "gold_test_files": ["tests/test_cli.py"]
+      "gold_source_files": [
+        "src/dotenv/cli.py"
+      ],
+      "gold_test_files": [
+        "tests/test_cli.py"
+      ]
     },
     {
-      "id": "dotenv-697", "repo": "theskumar/python-dotenv", "issue": 697,
+      "id": "dotenv-697",
+      "repo": "theskumar/python-dotenv",
+      "issue": 697,
       "category": "argument_validation_error_handling",
       "summary": "`dotenv run` does not honor --no-override when expanding variables",
       "fix_commit": "e0310e5bb3f2b701b11bbc007ca0c82c1bd56f38",
       "base_commit": "a00cb2eed0704cd6d2071b2004c37e95ccc86ee5",
       "expected_eligibility": "eligible",
-      "gold_source_files": ["src/dotenv/cli.py"],
-      "gold_test_files": ["tests/test_cli.py"]
+      "gold_source_files": [
+        "src/dotenv/cli.py"
+      ],
+      "gold_test_files": [
+        "tests/test_cli.py"
+      ]
     },
     {
-      "id": "cachetools-423", "repo": "tkem/cachetools", "issue": 423,
+      "id": "cachetools-423",
+      "repo": "tkem/cachetools",
+      "issue": 423,
       "category": "logic_edge_case",
       "summary": "Detect an empty RRCache before calling choice",
       "fix_commit": "bcf9e8176ebe16da58751fce971c98ffe045ede1",
       "base_commit": "eadb91cc9d54a57d6738386bc5c575ff3c7d22ec",
       "expected_eligibility": "eligible",
-      "gold_source_files": ["src/cachetools/__init__.py"],
-      "gold_test_files": ["tests/test_rr.py"]
+      "gold_source_files": [
+        "src/cachetools/__init__.py"
+      ],
+      "gold_test_files": [
+        "tests/test_rr.py"
+      ]
     },
     {
-      "id": "cachetools-405", "repo": "tkem/cachetools", "issue": 405,
+      "id": "cachetools-405",
+      "repo": "tkem/cachetools",
+      "issue": 405,
       "category": "state_handling",
       "summary": "Cache.__setitem__ over-evicts when growing an existing key",
       "fix_commit": "39b31bc9b63abe98497409945e9d382d8918c8fb",
       "base_commit": "16e88894ef7d79b25a68f5a3b5411ed881342725",
       "expected_eligibility": "eligible",
-      "gold_source_files": ["src/cachetools/__init__.py"],
-      "gold_test_files": ["tests/__init__.py"]
+      "gold_source_files": [
+        "src/cachetools/__init__.py"
+      ],
+      "gold_test_files": [
+        "tests/__init__.py"
+      ]
     },
     {
-      "id": "humanize-105", "repo": "python-humanize/humanize", "issue": 105,
-      "category": "argument_validation_error_handling",
-      "summary": "i18n _get_default_locale_path fix",
-      "fix_commit": "96276945545972edfe462ed9809719f931c27b56",
-      "base_commit": "c5dcf109d1bf358cf29ecda15f7f640e52ecf704",
-      "expected_eligibility": "eligible",
-      "gold_source_files": ["src/humanize/i18n.py"],
-      "gold_test_files": ["tests/test_i18n.py"],
-      "known_risk": "Package imports a build-generated _version.py that is not in git; sandbox tests may fail at import (infrastructure)."
-    },
-    {
-      "id": "humanize-159", "repo": "python-humanize/humanize", "issue": 159,
-      "category": "logic_edge_case",
-      "summary": "Represent with a zero if the delta is too small",
-      "fix_commit": "62706fd4cb90ebeb9bf85685bad8ab1fa9d0c742",
-      "base_commit": "9d9de69177154b41b2d6ef412d1487639e99833d",
-      "expected_eligibility": "eligible",
-      "gold_source_files": ["src/humanize/time.py"],
-      "gold_test_files": ["tests/test_time.py"],
-      "known_risk": "Package reads its version via pkg_resources from installed metadata; sandbox tests may fail at import (infrastructure)."
-    },
-    {
-      "id": "pathspec-84", "repo": "cpburnz/python-pathspec", "issue": 84,
+      "id": "pathspec-84",
+      "repo": "cpburnz/python-pathspec",
+      "issue": 84,
       "category": "logic_edge_case",
       "summary": "Fix issue 84 (4-line change in pathspec.py)",
       "fix_commit": "81368adefcf18b97457958cb50bb04785e63cc6e",
       "base_commit": "37e289515fbae7e92077a2438996046e79cae5bf",
       "expected_eligibility": "eligible",
-      "gold_source_files": ["pathspec/pathspec.py"],
-      "gold_test_files": ["tests/test_01_util.py", "tests/test_03_pathspec.py"]
+      "gold_source_files": [
+        "pathspec/pathspec.py"
+      ],
+      "gold_test_files": [
+        "tests/test_01_util.py",
+        "tests/test_03_pathspec.py"
+      ]
     },
     {
-      "id": "pathspec-77", "repo": "cpburnz/python-pathspec", "issue": 77,
+      "id": "pathspec-77",
+      "repo": "cpburnz/python-pathspec",
+      "issue": 77,
       "category": "parsing_serialization",
       "summary": "Fix issue 77 (gitwildmatch pattern handling)",
       "fix_commit": "9302492483b06ca1613aa8b11cf08cef93930b12",
       "base_commit": "6fd6bee628f5f2746ac46939b13fd127941a73f9",
       "expected_eligibility": "eligible",
-      "gold_source_files": ["pathspec/patterns/gitwildmatch.py"],
-      "gold_test_files": ["tests/test_gitwildmatch.py"]
+      "gold_source_files": [
+        "pathspec/patterns/gitwildmatch.py"
+      ],
+      "gold_test_files": [
+        "tests/test_gitwildmatch.py"
+      ]
     },
     {
-      "id": "cachetools-395", "repo": "tkem/cachetools", "issue": 395,
+      "id": "cachetools-395",
+      "repo": "tkem/cachetools",
+      "issue": 395,
       "category": "negative_documentation",
       "summary": "Fixed by documenting FIFOCache update behavior (docs only)",
       "fix_commit": "c624ceb350d50bb733ccaa706613495999b9479f",
@@ -97,7 +114,9 @@
       "gold_test_files": []
     },
     {
-      "id": "semver-429", "repo": "python-semver/python-semver", "issue": 429,
+      "id": "semver-429",
+      "repo": "python-semver/python-semver",
+      "issue": 429,
       "category": "negative_documentation",
       "summary": "Fixed by a documentation change (pydantic/JSON serialization docs)",
       "fix_commit": "a951c8a24fd5557622240de504c667e3900f3be5",
@@ -105,6 +124,16 @@
       "expected_eligibility": "unsupported",
       "gold_source_files": [],
       "gold_test_files": []
+    }
+  ],
+  "excluded_before_run": [
+    {
+      "id": "humanize-159",
+      "reason": "Pre-flight verify_cases.py (2026-11-07): python-humanize/humanize #159 is a pull request ('metric: Fix precision format'), not the issue the 2020 fix commit referred to; the commit's issue numbers predate the current repository's numbering."
+    },
+    {
+      "id": "humanize-105",
+      "reason": "Excluded with humanize-159: same numbering problem, so #105 ('Some tests fails with pytest-randomly') cannot be confirmed as the issue the fix commit referred to."
     }
   ]
 }

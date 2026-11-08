@@ -44,8 +44,8 @@ def sandbox(status, baseline=True):
 
 def test_registered_cases_are_well_formed():
     cases = load_cases()
-    assert len(cases) == 10
-    assert len({c["repo"] for c in cases}) == 5
+    assert len(cases) == 8
+    assert len({c["repo"] for c in cases}) == 4
     negatives = [c for c in cases if c["expected_eligibility"] == "unsupported"]
     assert len(negatives) == 2 and all(not c["gold_source_files"] for c in negatives)
     positives = [c for c in cases if c["expected_eligibility"] == "eligible"]
