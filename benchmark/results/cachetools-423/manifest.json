@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "draft_unverified",
+  "repository": "tkem/cachetools",
+  "issue_url": "https://github.com/tkem/cachetools/issues/423",
+  "base_commit": "eadb91cc9d54a57d6738386bc5c575ff3c7d22ec",
+  "model": "gpt-5-mini",
+  "source_sha256": {
+    "src/cachetools/__init__.py": "525ba807fed4af10744f068b5f9b81710903b6f73ee897469d3bf615847e2bd0",
+    "tests/test_rr.py": "7f56f910027e0f38f10757a0b7feb3493ddea6a71ae0ffd3c24d85485803c373"
+  },
+  "patch_sha256": "0506e8c6a62a5466daef546b752c1c7db1df9371d9dd48a512f3a2835437a590",
+  "selected_files": [
+    "src/cachetools/__init__.py",
+    "tests/test_rr.py"
+  ],
+  "modified_files": [
+    "src/cachetools/__init__.py",
+    "tests/test_rr.py"
+  ],
+  "summary": "Ensure RRCache.popitem() raises KeyError when the cache is empty regardless of the provided choice function. Add a regression test that uses choice=min (which raises ValueError on empty) and expects KeyError from popitem().",
+  "risks": "Low. Change avoids calling the choice function on an empty internal keys list; behavior when non-empty is unchanged. No public API changes. Potentially masks choice-side errors only when the cache is empty (intended).",
+  "regression_tests": [
+    "test_popitem_empty_raises_keyerror"
+  ],
+  "warning": "LLM patch draft. Not applied, tested, or approved. Review before Docker execution.",
+  "selection": {
+    "mode": "automatic",
+    "source_files": [
+      "src/cachetools/__init__.py"
+    ],
+    "test_files": [
+      "tests/test_rr.py"
+    ],
+    "eligibility_category": "logic_bug",
+    "discovery_confidence": "high"
+  }
+}

@@ -1,0 +1,243 @@
+{
+  "summary": {
+    "cases": 8,
+    "eligibility_accuracy": "7/8",
+    "eligible_cases_flagged_needs_review": 0,
+    "discovery_full_recall": "6/6",
+    "discovery_mean_recall": 1.0,
+    "test_file_hit": "5/6",
+    "patch_generated": "4/6",
+    "patch_apply_rate": "4/4",
+    "test_pass_rate": "3/3",
+    "regression_validated": "3/3",
+    "infrastructure_failures": 1,
+    "mean_tool_calls": 4.7,
+    "mean_tokens": 50380,
+    "outcomes": {
+      "infrastructure": 1,
+      "patch_failed": 2,
+      "validated": 3,
+      "correct_rejection": 1,
+      "missed_rejection": 1
+    }
+  },
+  "cases": [
+    {
+      "id": "dotenv-699",
+      "category": "argument_validation_error_handling",
+      "expected_eligibility": "eligible",
+      "raw_eligibility": "eligible",
+      "eligibility_correct": true,
+      "pipeline_status": "draft_ready",
+      "discovery_status": "selected",
+      "selected_source_files": [
+        "src/dotenv/cli.py"
+      ],
+      "selected_test_files": [
+        "tests/test_cli.py"
+      ],
+      "source_recall": 1.0,
+      "test_file_hit": true,
+      "patch_generated": true,
+      "patch_applies": true,
+      "baseline_clean": false,
+      "tests_pass": false,
+      "regression_validated": null,
+      "tool_calls": 3,
+      "model_requests": 6,
+      "tokens": 27512,
+      "seconds": 41.7,
+      "outcome": "infrastructure",
+      "failure_reason": "baseline test suite does not run cleanly in the sandbox"
+    },
+    {
+      "id": "dotenv-697",
+      "category": "argument_validation_error_handling",
+      "expected_eligibility": "eligible",
+      "raw_eligibility": "eligible",
+      "eligibility_correct": true,
+      "pipeline_status": "patch_failed",
+      "discovery_status": "selected",
+      "selected_source_files": [
+        "src/dotenv/cli.py",
+        "src/dotenv/main.py"
+      ],
+      "selected_test_files": [
+        "tests/test_cli.py"
+      ],
+      "source_recall": 1.0,
+      "test_file_hit": true,
+      "patch_generated": false,
+      "patch_applies": null,
+      "baseline_clean": null,
+      "tests_pass": null,
+      "regression_validated": null,
+      "tool_calls": 5,
+      "model_requests": 8,
+      "tokens": 57198,
+      "seconds": 82.6,
+      "outcome": "patch_failed",
+      "failure_reason": "Model did not return valid structured edit JSON"
+    },
+    {
+      "id": "cachetools-423",
+      "category": "logic_edge_case",
+      "expected_eligibility": "eligible",
+      "raw_eligibility": "eligible",
+      "eligibility_correct": true,
+      "pipeline_status": "draft_ready",
+      "discovery_status": "selected",
+      "selected_source_files": [
+        "src/cachetools/__init__.py"
+      ],
+      "selected_test_files": [
+        "tests/test_rr.py"
+      ],
+      "source_recall": 1.0,
+      "test_file_hit": true,
+      "patch_generated": true,
+      "patch_applies": true,
+      "baseline_clean": true,
+      "tests_pass": true,
+      "regression_validated": true,
+      "tool_calls": 3,
+      "model_requests": 6,
+      "tokens": 35745,
+      "seconds": 51.6,
+      "outcome": "validated",
+      "failure_reason": ""
+    },
+    {
+      "id": "cachetools-405",
+      "category": "state_handling",
+      "expected_eligibility": "eligible",
+      "raw_eligibility": "eligible",
+      "eligibility_correct": true,
+      "pipeline_status": "draft_ready",
+      "discovery_status": "selected",
+      "selected_source_files": [
+        "src/cachetools/__init__.py"
+      ],
+      "selected_test_files": [
+        "tests/test_lru.py"
+      ],
+      "source_recall": 1.0,
+      "test_file_hit": false,
+      "patch_generated": true,
+      "patch_applies": true,
+      "baseline_clean": true,
+      "tests_pass": true,
+      "regression_validated": true,
+      "tool_calls": 5,
+      "model_requests": 8,
+      "tokens": 64976,
+      "seconds": 74.9,
+      "outcome": "validated",
+      "failure_reason": ""
+    },
+    {
+      "id": "pathspec-84",
+      "category": "logic_edge_case",
+      "expected_eligibility": "eligible",
+      "raw_eligibility": "eligible",
+      "eligibility_correct": true,
+      "pipeline_status": "draft_ready",
+      "discovery_status": "selected",
+      "selected_source_files": [
+        "pathspec/pathspec.py"
+      ],
+      "selected_test_files": [
+        "tests/test_03_pathspec.py"
+      ],
+      "source_recall": 1.0,
+      "test_file_hit": true,
+      "patch_generated": true,
+      "patch_applies": true,
+      "baseline_clean": true,
+      "tests_pass": true,
+      "regression_validated": true,
+      "tool_calls": 9,
+      "model_requests": 12,
+      "tokens": 96606,
+      "seconds": 54.6,
+      "outcome": "validated",
+      "failure_reason": ""
+    },
+    {
+      "id": "pathspec-77",
+      "category": "parsing_serialization",
+      "expected_eligibility": "eligible",
+      "raw_eligibility": "eligible",
+      "eligibility_correct": true,
+      "pipeline_status": "patch_failed",
+      "discovery_status": "selected",
+      "selected_source_files": [
+        "pathspec/patterns/gitwildmatch.py"
+      ],
+      "selected_test_files": [
+        "tests/test_gitwildmatch.py"
+      ],
+      "source_recall": 1.0,
+      "test_file_hit": true,
+      "patch_generated": false,
+      "patch_applies": null,
+      "baseline_clean": null,
+      "tests_pass": null,
+      "regression_validated": null,
+      "tool_calls": 5,
+      "model_requests": 8,
+      "tokens": 57909,
+      "seconds": 48.8,
+      "outcome": "patch_failed",
+      "failure_reason": "Source mismatch for pathspec/patterns/gitwildmatch.py: exact old text must occur once; no patch was created"
+    },
+    {
+      "id": "cachetools-395",
+      "category": "negative_documentation",
+      "expected_eligibility": "unsupported",
+      "raw_eligibility": "unsupported",
+      "eligibility_correct": true,
+      "pipeline_status": "unsupported",
+      "discovery_status": null,
+      "selected_source_files": [],
+      "selected_test_files": [],
+      "source_recall": null,
+      "test_file_hit": null,
+      "patch_generated": false,
+      "patch_applies": null,
+      "baseline_clean": null,
+      "tests_pass": null,
+      "regression_validated": null,
+      "tool_calls": null,
+      "model_requests": 0,
+      "tokens": 0,
+      "seconds": 1.5,
+      "outcome": "correct_rejection",
+      "failure_reason": "eligibility=unsupported"
+    },
+    {
+      "id": "semver-429",
+      "category": "negative_documentation",
+      "expected_eligibility": "unsupported",
+      "raw_eligibility": "eligible",
+      "eligibility_correct": false,
+      "pipeline_status": "unsupported",
+      "discovery_status": "unsupported",
+      "selected_source_files": [],
+      "selected_test_files": [],
+      "source_recall": null,
+      "test_file_hit": null,
+      "patch_generated": false,
+      "patch_applies": null,
+      "baseline_clean": null,
+      "tests_pass": null,
+      "regression_validated": null,
+      "tool_calls": 3,
+      "model_requests": 5,
+      "tokens": 12716,
+      "seconds": 30.5,
+      "outcome": "missed_rejection",
+      "failure_reason": "eligibility=eligible"
+    }
+  ]
+}

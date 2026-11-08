@@ -1,0 +1,94 @@
+{
+  "case": "cachetools-405",
+  "issue_url": "https://github.com/tkem/cachetools/issues/405",
+  "base_commit": "16e88894ef7d79b25a68f5a3b5411ed881342725",
+  "pipeline": {
+    "exit_code": 0,
+    "seconds": 74.9,
+    "stdout_tail": "Status: draft_ready (stage: patch_generation)\nSelected source files: src/cachetools/__init__.py\nSelected test files: tests/test_lru.py\nCreated unverified draft: /Users/nanfang/Desktop/issuepilot-agent/benchmark/results/cachetools-405/fix.patch\nPinned source SHA: 16e88894ef7d79b25a68f5a3b5411ed881342725\nManifest: /Users/nanfang/Desktop/issuepilot-agent/benchmark/results/cachetools-405/manifest.json\nReview the diff and check out the pinned revision before running Docker.\nRun record: /Users/nanfang/Desktop/issuepilot-agent/benchmark/results/cachetools-405/run.json\n",
+    "stderr_tail": ""
+  },
+  "patch_applies": true,
+  "sandbox_full": {
+    "status": "patched_tests_passed",
+    "patch_check": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "\n",
+      "timed_out": false
+    },
+    "baseline": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "........................................................................ [ 24%]\n........................................................................ [ 49%]\n........................................................................ [ 74%]\n........................................................................ [ 98%]\n...                                                                      [100%]\n291 passed in 4.21s\n\n",
+      "timed_out": false
+    },
+    "patch_apply": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "\n",
+      "timed_out": false
+    },
+    "patched": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "........................................................................ [ 24%]\n........................................................................ [ 49%]\n........................................................................ [ 73%]\n........................................................................ [ 98%]\n....                                                                     [100%]\n292 passed in 4.20s\n\n",
+      "timed_out": false
+    },
+    "test_command": [
+      "python",
+      "-m",
+      "pytest",
+      "-q"
+    ],
+    "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+    "source": {
+      "files": 27,
+      "bytes": 206396
+    },
+    "provenance": {
+      "base_commit": "16e88894ef7d79b25a68f5a3b5411ed881342725",
+      "repository": "tkem/cachetools",
+      "files_checked": 2,
+      "patch_sha256": "41d9cc4f26f2eb0a4c417643cb61a79b69284ef7e70d08e3f9711d9a29333afe"
+    }
+  },
+  "sandbox_tests_only": {
+    "status": "patched_tests_failed",
+    "patch_check": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "\n",
+      "timed_out": false
+    },
+    "baseline": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "........................................................................ [ 24%]\n........................................................................ [ 49%]\n........................................................................ [ 74%]\n........................................................................ [ 98%]\n...                                                                      [100%]\n291 passed in 4.20s\n\n",
+      "timed_out": false
+    },
+    "patch_apply": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "\n",
+      "timed_out": false
+    },
+    "patched": {
+      "passed": false,
+      "exit_code": 1,
+      "output": "........................................................................ [ 24%]\n........................................................................ [ 49%]\n............................................................F........... [ 73%]\n........................................................................ [ 98%]\n....                                                                     [100%]\n=================================== FAILURES ===================================\n_________________ LRUCacheTest.test_lru_update_grow_getsizeof __________________\n\nself = <tests.test_lru.LRUCacheTest testMethod=test_lru_update_grow_getsizeof>\n\n    def test_lru_update_grow_getsizeof(self):\n        # Regression test: growing an existing key should not over-evict\n        cache = LRUCache[int, int](maxsize=10, getsizeof=lambda v: v)\n    \n        cache[\"a\"] = 3\n        cache[\"b\"] = 3          # currsize == 6\n        cache[\"b\"] = 7          # grow \"b\"; final size would be a(3) + b(7) == 10 == maxsize\n    \n>       self.assertEqual(dict(cache), {\"a\": 3, \"b\": 7})\nE       AssertionError: {'b': 7} != {'a': 3, 'b': 7}\nE       - {'b': 7}\nE       + {'a': 3, 'b': 7}\n\ntests/test_lru.py:66: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_lru.py::LRUCacheTest::test_lru_update_grow_getsizeof - Asse...\n1 failed, 291 passed in 4.20s\n\n",
+      "timed_out": false
+    },
+    "test_command": [
+      "python",
+      "-m",
+      "pytest",
+      "-q"
+    ],
+    "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+    "source": {
+      "files": 27,
+      "bytes": 206396
+    }
+  }
+}

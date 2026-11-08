@@ -1,0 +1,33 @@
+diff --git a/src/cachetools/__init__.py b/src/cachetools/__init__.py
+--- a/src/cachetools/__init__.py
++++ b/src/cachetools/__init__.py
+@@ -80,7 +80,7 @@
+         if size > maxsize:
+             raise ValueError("value too large")
+         if key not in self.__data or self.__size[key] < size:
+-            while self.__currsize + size > maxsize:
++            while self.__currsize - (self.__size[key] if key in self.__data else 0) + size > maxsize:
+                 self.popitem()
+         if key in self.__data:
+             diffsize = size - self.__size[key]
+diff --git a/tests/test_lru.py b/tests/test_lru.py
+--- a/tests/test_lru.py
++++ b/tests/test_lru.py
+@@ -55,6 +55,17 @@
+         self.assertEqual(len(cache), 1)
+         self.assertEqual(cache[3], 3)
+ 
++    def test_lru_update_grow_getsizeof(self):
++        # Regression test: growing an existing key should not over-evict
++        cache = LRUCache[int, int](maxsize=10, getsizeof=lambda v: v)
++
++        cache["a"] = 3
++        cache["b"] = 3          # currsize == 6
++        cache["b"] = 7          # grow "b"; final size would be a(3) + b(7) == 10 == maxsize
++
++        self.assertEqual(dict(cache), {"a": 3, "b": 7})
++        self.assertEqual(cache.currsize, 10)
++
+     def test_lru_update_existing(self):
+         cache = LRUCache[int, int | str](maxsize=2)
+ 

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "draft_unverified",
+  "repository": "theskumar/python-dotenv",
+  "issue_url": "https://github.com/theskumar/python-dotenv/issues/699",
+  "base_commit": "58f2d7c112235b347040bb5cb579d4ebc0a0ad91",
+  "model": "gpt-5-mini",
+  "source_sha256": {
+    "src/dotenv/cli.py": "ac883ae320efdb9aabcf417e387912ced6544128fc236ad28de109b37c38ee66",
+    "tests/test_cli.py": "273255f804cb8411b83ce849bebed0d49dda73fbfc2eebf2ced3bbf8bb3d0ae8"
+  },
+  "patch_sha256": "43aba7d9f8f83da6cb63c88e8841da0880618045d44f2e976e875c7338b5bc93",
+  "selected_files": [
+    "src/dotenv/cli.py",
+    "tests/test_cli.py"
+  ],
+  "modified_files": [
+    "src/dotenv/cli.py",
+    "tests/test_cli.py"
+  ],
+  "summary": "Fix CLI `get` to treat empty string values as present (exit 0) by distinguishing None (missing) from empty string, and add a regression test verifying that a key with an empty value returns exit code 0 and prints an empty line.",
+  "risks": "Low. Change only affects CLI get command behavior to correctly treat empty strings as present. Behaviour for keys missing or with value None remains unchanged (exit 1).",
+  "regression_tests": [
+    "tests/test_cli.py::test_get_empty_value \u2014 verifies that a key with an empty value (a=) returns exit code 0 and outputs an empty line"
+  ],
+  "warning": "LLM patch draft. Not applied, tested, or approved. Review before Docker execution.",
+  "selection": {
+    "mode": "automatic",
+    "source_files": [
+      "src/dotenv/cli.py"
+    ],
+    "test_files": [
+      "tests/test_cli.py"
+    ],
+    "eligibility_category": "logic_bug",
+    "discovery_confidence": "high"
+  }
+}

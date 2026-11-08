@@ -1,0 +1,43 @@
+{
+  "status": "unsupported",
+  "stage": "eligibility",
+  "issue_url": "https://github.com/tkem/cachetools/issues/395",
+  "repository": "tkem/cachetools",
+  "revision": "1ddec068633641895b6926dcea27276d5149c038",
+  "detail": "Issue labels mark it as out of scope: docs.",
+  "eligibility": {
+    "status": "unsupported",
+    "reasons": [
+      {
+        "code": "blocking_label",
+        "detail": "Issue labels mark it as out of scope: docs."
+      }
+    ],
+    "category": null,
+    "confidence": null,
+    "rationale": "",
+    "mentioned_symbols": [],
+    "signals": {
+      "repository_language": "Python",
+      "python_files": 20,
+      "library_python_files": 5,
+      "tree_truncated": false,
+      "labels": [
+        "docs"
+      ],
+      "blocking_labels": [
+        "docs"
+      ],
+      "bug_labels": [],
+      "issue_state": "closed",
+      "explicit_revision": true
+    },
+    "model_consulted": false,
+    "human_override": false
+  },
+  "discovery": null,
+  "manifest": null,
+  "usage": {},
+  "patch_sha256": null,
+  "warning": "Automated decisions and any draft patch are unverified. Review before running the Docker sandbox with --approve."
+}

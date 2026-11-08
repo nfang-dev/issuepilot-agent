@@ -1,0 +1,38 @@
+{
+  "status": "patched_tests_failed",
+  "patch_check": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "baseline": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "........................................................................ [ 67%]\n..................................                                       [100%]\n106 passed in 0.04s\n\n",
+    "timed_out": false
+  },
+  "patch_apply": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "patched": {
+    "passed": false,
+    "exit_code": 1,
+    "output": "........................................................................ [ 67%]\n..........F........................                                      [100%]\n=================================== FAILURES ===================================\n_________ PathSpecTest.test_05a_match_file_returns_bool_when_no_match __________\n\nself = <tests.test_03_pathspec.PathSpecTest testMethod=test_05a_match_file_returns_bool_when_no_match>\n\n    def test_05a_match_file_returns_bool_when_no_match(self):\n    \t\"\"\"\n    \tTest that match_file() returns a boolean False when no patterns match,\n    \trather than None.\n    \t\"\"\"\n    \tspec = PathSpec.from_lines('gitwildmatch', [])\n>   \tself.assertIs(spec.match_file('test.yaml'), False)\nE    AssertionError: None is not False\n\ntests/test_03_pathspec.py:463: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_03_pathspec.py::PathSpecTest::test_05a_match_file_returns_bool_when_no_match\n1 failed, 106 passed in 0.04s\n\n",
+    "timed_out": false
+  },
+  "test_command": [
+    "python",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+  "source": {
+    "files": 33,
+    "bytes": 197776
+  }
+}

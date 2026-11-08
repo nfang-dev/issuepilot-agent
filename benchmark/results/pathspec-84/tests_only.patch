@@ -1,0 +1,18 @@
+diff --git a/tests/test_03_pathspec.py b/tests/test_03_pathspec.py
+--- a/tests/test_03_pathspec.py
++++ b/tests/test_03_pathspec.py
+@@ -454,6 +454,14 @@
+ 			'Y/Z/c.txt',
+ 		})
+ 
++	def test_05a_match_file_returns_bool_when_no_match(self):
++		"""
++		Test that match_file() returns a boolean False when no patterns match,
++		rather than None.
++		"""
++		spec = PathSpec.from_lines('gitwildmatch', [])
++		self.assertIs(spec.match_file('test.yaml'), False)
++
+ 	def test_05_match_files(self):
+ 		"""
+ 		Test matching files collectively.

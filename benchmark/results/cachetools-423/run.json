@@ -1,0 +1,166 @@
+{
+  "status": "draft_ready",
+  "stage": "patch_generation",
+  "issue_url": "https://github.com/tkem/cachetools/issues/423",
+  "repository": "tkem/cachetools",
+  "revision": "eadb91cc9d54a57d6738386bc5c575ff3c7d22ec",
+  "detail": "",
+  "eligibility": {
+    "status": "eligible",
+    "reasons": [
+      {
+        "code": "category_logic_bug",
+        "detail": "Supported Python logic bug."
+      }
+    ],
+    "category": "logic_bug",
+    "confidence": "high",
+    "rationale": "RRCache.popitem() calls the provided choice function on an empty sequence and thus propagates whatever exception that function raises (ValueError, StopIteration, etc.) instead of consistently raising KeyError('RRCache is empty') like the other cache classes. The report includes a minimal reproduction and expected vs actual behavior; this is a straightforward logic bug fix.",
+    "mentioned_symbols": [
+      "RRCache.popitem",
+      "RRCache",
+      "choice",
+      "random.choice",
+      "FIFOCache",
+      "LRUCache",
+      "TTLCache",
+      "LFUCache"
+    ],
+    "signals": {
+      "repository_language": "Python",
+      "python_files": 20,
+      "library_python_files": 5,
+      "tree_truncated": false,
+      "labels": [
+        "bug"
+      ],
+      "blocking_labels": [],
+      "bug_labels": [
+        "bug"
+      ],
+      "issue_state": "closed",
+      "explicit_revision": true
+    },
+    "model_consulted": true,
+    "human_override": false
+  },
+  "discovery": {
+    "status": "selected",
+    "reason": "grounded_selection",
+    "revision": "eadb91cc9d54a57d6738386bc5c575ff3c7d22ec",
+    "source_files": [
+      "src/cachetools/__init__.py"
+    ],
+    "test_files": [
+      "tests/test_rr.py"
+    ],
+    "confidence": "high",
+    "rationale": "The bug is implemented in RRCache.popitem in src/cachetools/__init__.py; the method calls the provided choice function on the internal keys list and only catches IndexError, allowing other exceptions from choice to leak instead of raising the expected KeyError when the cache is empty. The relevant tests exercising RRCache (including use of choice=min) live in tests/test_rr.py, and a regression test should be added there. I read both files and located the exact popitem implementation and existing RR tests.",
+    "evidence": [
+      {
+        "path": "src/cachetools/__init__.py",
+        "detail": "RRCache.popitem: try:\\n    key = self.__choice(self.__keys)\\nexcept IndexError:\\n    raise KeyError(\"%s is empty\" % type(self).__name__) from None\\nelse:\\n    return (key, self.pop(key)) (shows bug: only IndexError caught)"
+      },
+      {
+        "path": "tests/test_rr.py",
+        "detail": "tests use RRCache with choice=min and define a bad_choice raising ValueError; relevant existing tests: test_rr, test_rr_getsizeof, test_rr_bad_choice (indicates regression test belongs here)"
+      }
+    ],
+    "provisional": {},
+    "warnings": [],
+    "tool_calls": [
+      {
+        "round": 1,
+        "name": "search_code",
+        "arguments": {
+          "query": "class RRCache",
+          "path_prefix": "src/cachetools"
+        },
+        "ok": true
+      },
+      {
+        "round": 2,
+        "name": "read_file",
+        "arguments": {
+          "path": "src/cachetools/__init__.py"
+        },
+        "ok": true
+      },
+      {
+        "round": 3,
+        "name": "read_file",
+        "arguments": {
+          "path": "tests/test_rr.py"
+        },
+        "ok": true
+      }
+    ],
+    "submissions": [
+      {
+        "round": 4,
+        "accepted": true,
+        "problems": [],
+        "decision": "selected"
+      }
+    ],
+    "exploration_calls": 3,
+    "file_fetches": 6
+  },
+  "manifest": {
+    "schema_version": 1,
+    "status": "draft_unverified",
+    "repository": "tkem/cachetools",
+    "issue_url": "https://github.com/tkem/cachetools/issues/423",
+    "base_commit": "eadb91cc9d54a57d6738386bc5c575ff3c7d22ec",
+    "model": "gpt-5-mini",
+    "source_sha256": {
+      "src/cachetools/__init__.py": "525ba807fed4af10744f068b5f9b81710903b6f73ee897469d3bf615847e2bd0",
+      "tests/test_rr.py": "7f56f910027e0f38f10757a0b7feb3493ddea6a71ae0ffd3c24d85485803c373"
+    },
+    "patch_sha256": "0506e8c6a62a5466daef546b752c1c7db1df9371d9dd48a512f3a2835437a590",
+    "selected_files": [
+      "src/cachetools/__init__.py",
+      "tests/test_rr.py"
+    ],
+    "modified_files": [
+      "src/cachetools/__init__.py",
+      "tests/test_rr.py"
+    ],
+    "summary": "Ensure RRCache.popitem() raises KeyError when the cache is empty regardless of the provided choice function. Add a regression test that uses choice=min (which raises ValueError on empty) and expects KeyError from popitem().",
+    "risks": "Low. Change avoids calling the choice function on an empty internal keys list; behavior when non-empty is unchanged. No public API changes. Potentially masks choice-side errors only when the cache is empty (intended).",
+    "regression_tests": [
+      "test_popitem_empty_raises_keyerror"
+    ],
+    "warning": "LLM patch draft. Not applied, tested, or approved. Review before Docker execution.",
+    "selection": {
+      "mode": "automatic",
+      "source_files": [
+        "src/cachetools/__init__.py"
+      ],
+      "test_files": [
+        "tests/test_rr.py"
+      ],
+      "eligibility_category": "logic_bug",
+      "discovery_confidence": "high"
+    }
+  },
+  "usage": {
+    "eligibility": {
+      "requests": 1,
+      "input_tokens": 1249,
+      "output_tokens": 498
+    },
+    "discovery": {
+      "requests": 4,
+      "input_tokens": 22612,
+      "output_tokens": 721
+    },
+    "patch_generation": {
+      "requests": 1,
+      "input_tokens": 7508,
+      "output_tokens": 3157
+    }
+  },
+  "patch_sha256": "0506e8c6a62a5466daef546b752c1c7db1df9371d9dd48a512f3a2835437a590",
+  "warning": "Automated decisions and any draft patch are unverified. Review before running the Docker sandbox with --approve."
+}

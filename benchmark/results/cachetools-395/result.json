@@ -1,0 +1,11 @@
+{
+  "case": "cachetools-395",
+  "issue_url": "https://github.com/tkem/cachetools/issues/395",
+  "base_commit": "1ddec068633641895b6926dcea27276d5149c038",
+  "pipeline": {
+    "exit_code": 3,
+    "seconds": 1.5,
+    "stdout_tail": "Status: unsupported (stage: eligibility)\nDetail: Issue labels mark it as out of scope: docs.\nRun record: /Users/nanfang/Desktop/issuepilot-agent/benchmark/results/cachetools-395/run.json\n",
+    "stderr_tail": ""
+  }
+}

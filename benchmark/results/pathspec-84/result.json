@@ -1,0 +1,94 @@
+{
+  "case": "pathspec-84",
+  "issue_url": "https://github.com/cpburnz/python-pathspec/issues/84",
+  "base_commit": "37e289515fbae7e92077a2438996046e79cae5bf",
+  "pipeline": {
+    "exit_code": 0,
+    "seconds": 54.6,
+    "stdout_tail": "Status: draft_ready (stage: patch_generation)\nSelected source files: pathspec/pathspec.py\nSelected test files: tests/test_03_pathspec.py\nCreated unverified draft: /Users/nanfang/Desktop/issuepilot-agent/benchmark/results/pathspec-84/fix.patch\nPinned source SHA: 37e289515fbae7e92077a2438996046e79cae5bf\nManifest: /Users/nanfang/Desktop/issuepilot-agent/benchmark/results/pathspec-84/manifest.json\nReview the diff and check out the pinned revision before running Docker.\nRun record: /Users/nanfang/Desktop/issuepilot-agent/benchmark/results/pathspec-84/run.json\n",
+    "stderr_tail": ""
+  },
+  "patch_applies": true,
+  "sandbox_full": {
+    "status": "patched_tests_passed",
+    "patch_check": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "\n",
+      "timed_out": false
+    },
+    "baseline": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "........................................................................ [ 67%]\n..................................                                       [100%]\n106 passed in 0.04s\n\n",
+      "timed_out": false
+    },
+    "patch_apply": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "\n",
+      "timed_out": false
+    },
+    "patched": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "........................................................................ [ 67%]\n...................................                                      [100%]\n107 passed in 0.04s\n\n",
+      "timed_out": false
+    },
+    "test_command": [
+      "python",
+      "-m",
+      "pytest",
+      "-q"
+    ],
+    "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+    "source": {
+      "files": 33,
+      "bytes": 197776
+    },
+    "provenance": {
+      "base_commit": "37e289515fbae7e92077a2438996046e79cae5bf",
+      "repository": "cpburnz/python-pathspec",
+      "files_checked": 2,
+      "patch_sha256": "71edf67d4e0d40a86ff5fdb3080ddcd592f233788fec6729481ba4e968331618"
+    }
+  },
+  "sandbox_tests_only": {
+    "status": "patched_tests_failed",
+    "patch_check": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "\n",
+      "timed_out": false
+    },
+    "baseline": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "........................................................................ [ 67%]\n..................................                                       [100%]\n106 passed in 0.04s\n\n",
+      "timed_out": false
+    },
+    "patch_apply": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "\n",
+      "timed_out": false
+    },
+    "patched": {
+      "passed": false,
+      "exit_code": 1,
+      "output": "........................................................................ [ 67%]\n..........F........................                                      [100%]\n=================================== FAILURES ===================================\n_________ PathSpecTest.test_05a_match_file_returns_bool_when_no_match __________\n\nself = <tests.test_03_pathspec.PathSpecTest testMethod=test_05a_match_file_returns_bool_when_no_match>\n\n    def test_05a_match_file_returns_bool_when_no_match(self):\n    \t\"\"\"\n    \tTest that match_file() returns a boolean False when no patterns match,\n    \trather than None.\n    \t\"\"\"\n    \tspec = PathSpec.from_lines('gitwildmatch', [])\n>   \tself.assertIs(spec.match_file('test.yaml'), False)\nE    AssertionError: None is not False\n\ntests/test_03_pathspec.py:463: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_03_pathspec.py::PathSpecTest::test_05a_match_file_returns_bool_when_no_match\n1 failed, 106 passed in 0.04s\n\n",
+      "timed_out": false
+    },
+    "test_command": [
+      "python",
+      "-m",
+      "pytest",
+      "-q"
+    ],
+    "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+    "source": {
+      "files": 33,
+      "bytes": 197776
+    }
+  }
+}

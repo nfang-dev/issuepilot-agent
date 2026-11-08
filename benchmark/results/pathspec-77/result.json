@@ -1,0 +1,11 @@
+{
+  "case": "pathspec-77",
+  "issue_url": "https://github.com/cpburnz/python-pathspec/issues/77",
+  "base_commit": "6fd6bee628f5f2746ac46939b13fd127941a73f9",
+  "pipeline": {
+    "exit_code": 5,
+    "seconds": 48.8,
+    "stdout_tail": "Status: patch_failed (stage: patch_generation)\nDetail: Source mismatch for pathspec/patterns/gitwildmatch.py: exact old text must occur once; no patch was created\nSelected source files: pathspec/patterns/gitwildmatch.py\nSelected test files: tests/test_gitwildmatch.py\nRun record: /Users/nanfang/Desktop/issuepilot-agent/benchmark/results/pathspec-77/run.json\n",
+    "stderr_tail": ""
+  }
+}

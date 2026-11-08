@@ -1,0 +1,30 @@
+diff --git a/pathspec/pathspec.py b/pathspec/pathspec.py
+--- a/pathspec/pathspec.py
++++ b/pathspec/pathspec.py
+@@ -277,7 +277,7 @@
+ 		"""
+ 		norm_file = normalize_file(file, separators)
+ 		include, _index = self._match_file(enumerate(self.patterns), norm_file)
+-		return include
++		return bool(include)
+ 
+ 	def match_files(
+ 		self,
+diff --git a/tests/test_03_pathspec.py b/tests/test_03_pathspec.py
+--- a/tests/test_03_pathspec.py
++++ b/tests/test_03_pathspec.py
+@@ -454,6 +454,14 @@
+ 			'Y/Z/c.txt',
+ 		})
+ 
++	def test_05a_match_file_returns_bool_when_no_match(self):
++		"""
++		Test that match_file() returns a boolean False when no patterns match,
++		rather than None.
++		"""
++		spec = PathSpec.from_lines('gitwildmatch', [])
++		self.assertIs(spec.match_file('test.yaml'), False)
++
+ 	def test_05_match_files(self):
+ 		"""
+ 		Test matching files collectively.

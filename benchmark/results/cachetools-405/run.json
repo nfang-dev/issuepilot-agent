@@ -1,0 +1,179 @@
+{
+  "status": "draft_ready",
+  "stage": "patch_generation",
+  "issue_url": "https://github.com/tkem/cachetools/issues/405",
+  "repository": "tkem/cachetools",
+  "revision": "16e88894ef7d79b25a68f5a3b5411ed881342725",
+  "detail": "",
+  "eligibility": {
+    "status": "eligible",
+    "reasons": [
+      {
+        "code": "category_logic_bug",
+        "detail": "Supported Python logic bug."
+      }
+    ],
+    "category": "logic_bug",
+    "confidence": "high",
+    "rationale": "The report describes incorrect eviction logic in Cache.__setitem__: when updating an existing key the code reserves the full new size instead of the additional delta, causing unnecessary popitem() calls and evicting live entries. A concise repro is included, and the intended behavior is clear (reserve only the delta for existing keys). This is a bug in Python library logic that can be covered by a unit test.",
+    "mentioned_symbols": [
+      "Cache.__setitem__",
+      "getsizeof",
+      "self.__currsize",
+      "popitem",
+      "maxsize",
+      "LRUCache",
+      "FIFOCache",
+      "diffsize"
+    ],
+    "signals": {
+      "repository_language": "Python",
+      "python_files": 20,
+      "library_python_files": 5,
+      "tree_truncated": false,
+      "labels": [],
+      "blocking_labels": [],
+      "bug_labels": [],
+      "issue_state": "closed",
+      "explicit_revision": true
+    },
+    "model_consulted": true,
+    "human_override": false
+  },
+  "discovery": {
+    "status": "selected",
+    "reason": "grounded_selection",
+    "revision": "16e88894ef7d79b25a68f5a3b5411ed881342725",
+    "source_files": [
+      "src/cachetools/__init__.py"
+    ],
+    "test_files": [
+      "tests/test_lru.py"
+    ],
+    "confidence": "high",
+    "rationale": "The bug described is implemented in the shared base Cache.__setitem__ method. The implementation in src/cachetools/__init__.py reserves the full new size when updating an existing key (while self.__currsize + size > maxsize), which causes over-eviction when a value grows and getsizeof is set. Fixing this file addresses the root cause and will affect FIFOCache/LRUCache/RRCache/LFUCache which delegate to the base method. Adding a regression test in tests/test_lru.py is appropriate since LRUCache is affected and there is an existing getsizeof-related test module to extend.\n\nEvidence:\n- src/cachetools/__init__.py: Cache.__setitem__ uses 'while self.__currsize + size > maxsize: self.popitem()' thereby reserving full new size instead of the delta.\n- tests/test_lru.py: contains getsizeof tests and update-existing tests (test_lru_getsizeof, test_lru_update_existing), so it's the right place to add a regression test for growing an existing key with getsizeof.",
+    "evidence": [
+      {
+        "path": "src/cachetools/__init__.py",
+        "detail": "Cache.__setitem__ implementation: computes size = self.getsizeof(value), then if key not in self.__data or self.__size[key] < size: while self.__currsize + size > maxsize: self.popitem() ... diffsize = size - self.__size[key] (if key existed) then updates __currsize by diffsize. The while loop therefore double-counts the existing key's old size when growing an existing key."
+      },
+      {
+        "path": "tests/test_lru.py",
+        "detail": "Contains getsizeof and update-existing related tests (test_lru_getsizeof, test_lru_update_existing). This makes it an appropriate place to add a regression test verifying that growing an existing key that still fits does not evict other entries."
+      }
+    ],
+    "provisional": {},
+    "warnings": [],
+    "tool_calls": [
+      {
+        "round": 1,
+        "name": "search_code",
+        "arguments": {
+          "query": "def __setitem__",
+          "path_prefix": "src/cachetools"
+        },
+        "ok": true
+      },
+      {
+        "round": 2,
+        "name": "read_file",
+        "arguments": {
+          "path": "src/cachetools/__init__.py"
+        },
+        "ok": true
+      },
+      {
+        "round": 3,
+        "name": "search_code",
+        "arguments": {
+          "query": "getsizeof",
+          "path_prefix": "tests"
+        },
+        "ok": true
+      },
+      {
+        "round": 4,
+        "name": "read_file",
+        "arguments": {
+          "path": "tests/test_lru.py"
+        },
+        "ok": true
+      },
+      {
+        "round": 5,
+        "name": "read_file",
+        "arguments": {
+          "path": "tests/test_fifo.py"
+        },
+        "ok": true
+      }
+    ],
+    "submissions": [
+      {
+        "round": 6,
+        "accepted": true,
+        "problems": [],
+        "decision": "selected"
+      }
+    ],
+    "exploration_calls": 5,
+    "file_fetches": 15
+  },
+  "manifest": {
+    "schema_version": 1,
+    "status": "draft_unverified",
+    "repository": "tkem/cachetools",
+    "issue_url": "https://github.com/tkem/cachetools/issues/405",
+    "base_commit": "16e88894ef7d79b25a68f5a3b5411ed881342725",
+    "model": "gpt-5-mini",
+    "source_sha256": {
+      "src/cachetools/__init__.py": "f2aac531b8c967e049645544af0a6d38130d9bec98d104afa323280a8f526d75",
+      "tests/test_lru.py": "dbfd53eb372f24571f70d739faeb6c4963f79c80ef18228f44b38b1112bf1a6c"
+    },
+    "patch_sha256": "41d9cc4f26f2eb0a4c417643cb61a79b69284ef7e70d08e3f9711d9a29333afe",
+    "selected_files": [
+      "src/cachetools/__init__.py",
+      "tests/test_lru.py"
+    ],
+    "modified_files": [
+      "src/cachetools/__init__.py",
+      "tests/test_lru.py"
+    ],
+    "summary": "Fix Cache.__setitem__ to reserve only the additional space needed when updating an existing key (accounting for the old size) so growing an existing entry with getsizeof does not over-evict. Add a regression test for LRUCache demonstrating the previous incorrect eviction.",
+    "risks": "Low. Change is localized to the eviction condition in Cache.__setitem__ and a new unit test. Behavior for new insertions is unchanged. Edge cases where popitem evicts the key being updated are handled by reading the current presence/size inside the loop. Remaining risk: subtle interactions with custom getsizeof implementations are possible but this preserves the original semantics while fixing the over-reservation bug.",
+    "regression_tests": [
+      "tests/test_lru.py::LRUCacheTest::test_lru_update_grow_getsizeof"
+    ],
+    "warning": "LLM patch draft. Not applied, tested, or approved. Review before Docker execution.",
+    "selection": {
+      "mode": "automatic",
+      "source_files": [
+        "src/cachetools/__init__.py"
+      ],
+      "test_files": [
+        "tests/test_lru.py"
+      ],
+      "eligibility_category": "logic_bug",
+      "discovery_confidence": "high"
+    }
+  },
+  "usage": {
+    "eligibility": {
+      "requests": 1,
+      "input_tokens": 1343,
+      "output_tokens": 599
+    },
+    "discovery": {
+      "requests": 6,
+      "input_tokens": 48652,
+      "output_tokens": 1254
+    },
+    "patch_generation": {
+      "requests": 1,
+      "input_tokens": 7715,
+      "output_tokens": 5413
+    }
+  },
+  "patch_sha256": "41d9cc4f26f2eb0a4c417643cb61a79b69284ef7e70d08e3f9711d9a29333afe",
+  "warning": "Automated decisions and any draft patch are unverified. Review before running the Docker sandbox with --approve."
+}

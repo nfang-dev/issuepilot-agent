@@ -1,0 +1,161 @@
+{
+  "status": "draft_ready",
+  "stage": "patch_generation",
+  "issue_url": "https://github.com/theskumar/python-dotenv/issues/699",
+  "repository": "theskumar/python-dotenv",
+  "revision": "58f2d7c112235b347040bb5cb579d4ebc0a0ad91",
+  "detail": "",
+  "eligibility": {
+    "status": "eligible",
+    "reasons": [
+      {
+        "code": "category_logic_bug",
+        "detail": "Supported Python logic bug."
+      }
+    ],
+    "category": "logic_bug",
+    "confidence": "high",
+    "rationale": "The CLI command 'dotenv get' uses a truthiness check (if stored_value:) which treats empty strings as absent, causing an incorrect non-zero exit for present-empty keys. The library API functions (get_key/dotenv_values) already return empty strings correctly; only the CLI behavior is wrong and can be fixed by checking for None/key presence instead of truthiness.",
+    "mentioned_symbols": [
+      "get_key",
+      "dotenv_values",
+      "set_key",
+      "dotenv",
+      "get",
+      "EMPTY",
+      "ZERO"
+    ],
+    "signals": {
+      "repository_language": "Python",
+      "python_files": 20,
+      "library_python_files": 8,
+      "tree_truncated": false,
+      "labels": [],
+      "blocking_labels": [],
+      "bug_labels": [],
+      "issue_state": "closed",
+      "explicit_revision": true
+    },
+    "model_consulted": true,
+    "human_override": false
+  },
+  "discovery": {
+    "status": "selected",
+    "reason": "grounded_selection",
+    "revision": "58f2d7c112235b347040bb5cb579d4ebc0a0ad91",
+    "source_files": [
+      "src/dotenv/cli.py"
+    ],
+    "test_files": [
+      "tests/test_cli.py"
+    ],
+    "confidence": "high",
+    "rationale": "The CLI `get` command implemented in src/dotenv/cli.py uses a truthiness check (if stored_value:) after retrieving values with dotenv_values(stream=stream). This treats empty string values as missing and leads to exit code 1 for keys present with empty values. The fix should be made directly in src/dotenv/cli.py to distinguish None (missing) from empty string. tests/test_cli.py is the appropriate place to add a regression test, since it already contains tests for get existing and non-existent value cases.",
+    "evidence": [
+      {
+        "path": "src/dotenv/cli.py",
+        "detail": "In get():\n    with stream_file(file) as stream:\n        values = dotenv_values(stream=stream)\n\n    stored_value = values.get(key)\n    if stored_value:\n        click.echo(stored_value)\n    else:\n        sys.exit(1)\nThis shows the truthiness check that treats '' as missing."
+      },
+      {
+        "path": "tests/test_cli.py",
+        "detail": "Existing tests cover get existing and non-existent values:\n\ndef test_get_existing_value(cli, dotenv_path):\n    dotenv_path.write_text(\"a=b\")\n    result = cli.invoke(dotenv_cli, [\"--file\", dotenv_path, \"get\", \"a\"])\n    assert (result.exit_code, result.output) == (0, \"b\\n\")\n\ndef test_get_non_existent_value(cli, dotenv_path):\n    result = cli.invoke(dotenv_cli, [\"--file\", dotenv_path, \"get\", \"a\"])\n    assert (result.exit_code, result.output) == (1, \"\")\n\nAdd a new test asserting that a key with an empty value returns exit code 0 and prints an empty line."
+      }
+    ],
+    "provisional": {},
+    "warnings": [],
+    "tool_calls": [
+      {
+        "round": 1,
+        "name": "read_file",
+        "arguments": {
+          "path": "src/dotenv/cli.py"
+        },
+        "ok": true
+      },
+      {
+        "round": 2,
+        "name": "search_code",
+        "arguments": {
+          "query": "dotenv get",
+          "path_prefix": ""
+        },
+        "ok": true
+      },
+      {
+        "round": 3,
+        "name": "read_file",
+        "arguments": {
+          "path": "tests/test_cli.py"
+        },
+        "ok": true
+      }
+    ],
+    "submissions": [
+      {
+        "round": 4,
+        "accepted": true,
+        "problems": [],
+        "decision": "selected"
+      }
+    ],
+    "exploration_calls": 3,
+    "file_fetches": 12
+  },
+  "manifest": {
+    "schema_version": 1,
+    "status": "draft_unverified",
+    "repository": "theskumar/python-dotenv",
+    "issue_url": "https://github.com/theskumar/python-dotenv/issues/699",
+    "base_commit": "58f2d7c112235b347040bb5cb579d4ebc0a0ad91",
+    "model": "gpt-5-mini",
+    "source_sha256": {
+      "src/dotenv/cli.py": "ac883ae320efdb9aabcf417e387912ced6544128fc236ad28de109b37c38ee66",
+      "tests/test_cli.py": "273255f804cb8411b83ce849bebed0d49dda73fbfc2eebf2ced3bbf8bb3d0ae8"
+    },
+    "patch_sha256": "43aba7d9f8f83da6cb63c88e8841da0880618045d44f2e976e875c7338b5bc93",
+    "selected_files": [
+      "src/dotenv/cli.py",
+      "tests/test_cli.py"
+    ],
+    "modified_files": [
+      "src/dotenv/cli.py",
+      "tests/test_cli.py"
+    ],
+    "summary": "Fix CLI `get` to treat empty string values as present (exit 0) by distinguishing None (missing) from empty string, and add a regression test verifying that a key with an empty value returns exit code 0 and prints an empty line.",
+    "risks": "Low. Change only affects CLI get command behavior to correctly treat empty strings as present. Behaviour for keys missing or with value None remains unchanged (exit 1).",
+    "regression_tests": [
+      "tests/test_cli.py::test_get_empty_value \u2014 verifies that a key with an empty value (a=) returns exit code 0 and outputs an empty line"
+    ],
+    "warning": "LLM patch draft. Not applied, tested, or approved. Review before Docker execution.",
+    "selection": {
+      "mode": "automatic",
+      "source_files": [
+        "src/dotenv/cli.py"
+      ],
+      "test_files": [
+        "tests/test_cli.py"
+      ],
+      "eligibility_category": "logic_bug",
+      "discovery_confidence": "high"
+    }
+  },
+  "usage": {
+    "eligibility": {
+      "requests": 1,
+      "input_tokens": 850,
+      "output_tokens": 463
+    },
+    "discovery": {
+      "requests": 4,
+      "input_tokens": 17737,
+      "output_tokens": 1369
+    },
+    "patch_generation": {
+      "requests": 1,
+      "input_tokens": 5077,
+      "output_tokens": 2016
+    }
+  },
+  "patch_sha256": "43aba7d9f8f83da6cb63c88e8841da0880618045d44f2e976e875c7338b5bc93",
+  "warning": "Automated decisions and any draft patch are unverified. Review before running the Docker sandbox with --approve."
+}

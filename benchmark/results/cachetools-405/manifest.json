@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "draft_unverified",
+  "repository": "tkem/cachetools",
+  "issue_url": "https://github.com/tkem/cachetools/issues/405",
+  "base_commit": "16e88894ef7d79b25a68f5a3b5411ed881342725",
+  "model": "gpt-5-mini",
+  "source_sha256": {
+    "src/cachetools/__init__.py": "f2aac531b8c967e049645544af0a6d38130d9bec98d104afa323280a8f526d75",
+    "tests/test_lru.py": "dbfd53eb372f24571f70d739faeb6c4963f79c80ef18228f44b38b1112bf1a6c"
+  },
+  "patch_sha256": "41d9cc4f26f2eb0a4c417643cb61a79b69284ef7e70d08e3f9711d9a29333afe",
+  "selected_files": [
+    "src/cachetools/__init__.py",
+    "tests/test_lru.py"
+  ],
+  "modified_files": [
+    "src/cachetools/__init__.py",
+    "tests/test_lru.py"
+  ],
+  "summary": "Fix Cache.__setitem__ to reserve only the additional space needed when updating an existing key (accounting for the old size) so growing an existing entry with getsizeof does not over-evict. Add a regression test for LRUCache demonstrating the previous incorrect eviction.",
+  "risks": "Low. Change is localized to the eviction condition in Cache.__setitem__ and a new unit test. Behavior for new insertions is unchanged. Edge cases where popitem evicts the key being updated are handled by reading the current presence/size inside the loop. Remaining risk: subtle interactions with custom getsizeof implementations are possible but this preserves the original semantics while fixing the over-reservation bug.",
+  "regression_tests": [
+    "tests/test_lru.py::LRUCacheTest::test_lru_update_grow_getsizeof"
+  ],
+  "warning": "LLM patch draft. Not applied, tested, or approved. Review before Docker execution.",
+  "selection": {
+    "mode": "automatic",
+    "source_files": [
+      "src/cachetools/__init__.py"
+    ],
+    "test_files": [
+      "tests/test_lru.py"
+    ],
+    "eligibility_category": "logic_bug",
+    "discovery_confidence": "high"
+  }
+}

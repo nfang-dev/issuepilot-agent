@@ -1,0 +1,94 @@
+{
+  "case": "cachetools-423",
+  "issue_url": "https://github.com/tkem/cachetools/issues/423",
+  "base_commit": "eadb91cc9d54a57d6738386bc5c575ff3c7d22ec",
+  "pipeline": {
+    "exit_code": 0,
+    "seconds": 51.6,
+    "stdout_tail": "Status: draft_ready (stage: patch_generation)\nSelected source files: src/cachetools/__init__.py\nSelected test files: tests/test_rr.py\nCreated unverified draft: /Users/nanfang/Desktop/issuepilot-agent/benchmark/results/cachetools-423/fix.patch\nPinned source SHA: eadb91cc9d54a57d6738386bc5c575ff3c7d22ec\nManifest: /Users/nanfang/Desktop/issuepilot-agent/benchmark/results/cachetools-423/manifest.json\nReview the diff and check out the pinned revision before running Docker.\nRun record: /Users/nanfang/Desktop/issuepilot-agent/benchmark/results/cachetools-423/run.json\n",
+    "stderr_tail": ""
+  },
+  "patch_applies": true,
+  "sandbox_full": {
+    "status": "patched_tests_passed",
+    "patch_check": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "\n",
+      "timed_out": false
+    },
+    "baseline": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 64%]\n........................................................................ [ 85%]\n.................................................                        [100%]\n337 passed in 4.22s\n\n",
+      "timed_out": false
+    },
+    "patch_apply": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "\n",
+      "timed_out": false
+    },
+    "patched": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.22s\n\n",
+      "timed_out": false
+    },
+    "test_command": [
+      "python",
+      "-m",
+      "pytest",
+      "-q"
+    ],
+    "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+    "source": {
+      "files": 27,
+      "bytes": 211706
+    },
+    "provenance": {
+      "base_commit": "eadb91cc9d54a57d6738386bc5c575ff3c7d22ec",
+      "repository": "tkem/cachetools",
+      "files_checked": 2,
+      "patch_sha256": "0506e8c6a62a5466daef546b752c1c7db1df9371d9dd48a512f3a2835437a590"
+    }
+  },
+  "sandbox_tests_only": {
+    "status": "patched_tests_failed",
+    "patch_check": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "\n",
+      "timed_out": false
+    },
+    "baseline": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 64%]\n........................................................................ [ 85%]\n.................................................                        [100%]\n337 passed in 4.22s\n\n",
+      "timed_out": false
+    },
+    "patch_apply": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "\n",
+      "timed_out": false
+    },
+    "patched": {
+      "passed": false,
+      "exit_code": 1,
+      "output": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n.............................................F.......................... [ 85%]\n..................................................                       [100%]\n=================================== FAILURES ===================================\n________________ RRCacheTest.test_popitem_empty_raises_keyerror ________________\n\nself = <tests.test_rr.RRCacheTest testMethod=test_popitem_empty_raises_keyerror>\n\n    def test_popitem_empty_raises_keyerror(self):\n        # choice=min raises ValueError on empty sequences; popitem should\n        # still raise KeyError when the cache is empty.\n        cache = RRCache[int, int](maxsize=2, choice=min)\n        with self.assertRaises(KeyError):\n>           cache.popitem()\n\ntests/test_rr.py:91: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\n    def popitem(self):\n        \"\"\"Remove and return a random `(key, value)` pair.\"\"\"\n        try:\n>           key = self.__choice(self.__keys)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           ValueError: min() iterable argument is empty\n\nsrc/cachetools/__init__.py:361: ValueError\n=========================== short test summary info ============================\nFAILED tests/test_rr.py::RRCacheTest::test_popitem_empty_raises_keyerror - Va...\n1 failed, 337 passed in 4.23s\n\n",
+      "timed_out": false
+    },
+    "test_command": [
+      "python",
+      "-m",
+      "pytest",
+      "-q"
+    ],
+    "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+    "source": {
+      "files": 27,
+      "bytes": 211706
+    }
+  }
+}

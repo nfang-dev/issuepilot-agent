@@ -1,0 +1,138 @@
+{
+  "status": "patch_failed",
+  "stage": "patch_generation",
+  "issue_url": "https://github.com/cpburnz/python-pathspec/issues/77",
+  "repository": "cpburnz/python-pathspec",
+  "revision": "6fd6bee628f5f2746ac46939b13fd127941a73f9",
+  "detail": "Source mismatch for pathspec/patterns/gitwildmatch.py: exact old text must occur once; no patch was created",
+  "eligibility": {
+    "status": "eligible",
+    "reasons": [
+      {
+        "code": "category_logic_bug",
+        "detail": "Supported Python logic bug."
+      }
+    ],
+    "category": "logic_bug",
+    "confidence": "high",
+    "rationale": "The library's gitwildmatch implementation escapes '^' in bracket expressions (following POSIX / fnmatch.translate), producing behavior inconsistent with Git's gitignore (where [^...] is a negated class). The report includes a minimal shell reproduction and clearly states the expected vs actual behavior; the maintainer agreed to change behavior to match Git.",
+    "mentioned_symbols": [
+      "pathspec",
+      "gitignore",
+      "fnmatch.translate",
+      "gitwildmatch.py"
+    ],
+    "signals": {
+      "repository_language": "Python",
+      "python_files": 17,
+      "library_python_files": 9,
+      "tree_truncated": false,
+      "labels": [],
+      "blocking_labels": [],
+      "bug_labels": [],
+      "issue_state": "closed",
+      "explicit_revision": true
+    },
+    "model_consulted": true,
+    "human_override": false
+  },
+  "discovery": {
+    "status": "selected",
+    "reason": "grounded_selection",
+    "revision": "6fd6bee628f5f2746ac46939b13fd127941a73f9",
+    "source_files": [
+      "pathspec/patterns/gitwildmatch.py"
+    ],
+    "test_files": [
+      "tests/test_gitwildmatch.py"
+    ],
+    "confidence": "high",
+    "rationale": "The issue describes incorrect handling of '^' at the start of bracket expressions in gitignore-style patterns. The implementation that enforces escaping of '^' resides in GitWildMatchPattern._translate_segment_glob in pathspec/patterns/gitwildmatch.py; specifically it adds '\\\\^' when encountering '^' at the start of a bracket expression, which makes behavior inconsistent with Git. The appropriate regression test belongs in tests/test_gitwildmatch.py which already contains extensive tests for bracket expressions and glob translations. Fixing gitwildmatch.py and adding a test in tests/test_gitwildmatch.py will address the reported discrepancy.",
+    "evidence": [
+      {
+        "path": "pathspec/patterns/gitwildmatch.py",
+        "detail": "In _translate_segment_glob(), when parsing a bracket expression, code treats leading '^' specially: elif pattern[i] == '^': # POSIX declares ... Python's `fnmatch.translate()` escapes the caret ('^') as a literal. To maintain consistency with undefined behavior, I am escaping the '^' as well. expr += '\\\\^'; i += 1"
+      },
+      {
+        "path": "tests/test_gitwildmatch.py",
+        "detail": "This test module exercises GitWildMatchPattern and is the right place to add a regression test for bracket expression negation behavior; it contains many related tests for glob/brace/bracket behavior and calls GitWildMatchPattern.pattern_to_regex and GitWildMatchPattern(...) to verify matches."
+      }
+    ],
+    "provisional": {},
+    "warnings": [],
+    "tool_calls": [
+      {
+        "round": 1,
+        "name": "read_file",
+        "arguments": {
+          "path": "pathspec/patterns/gitwildmatch.py"
+        },
+        "ok": true
+      },
+      {
+        "round": 2,
+        "name": "search_code",
+        "arguments": {
+          "query": "\\^ in bracket",
+          "path_prefix": ""
+        },
+        "ok": true
+      },
+      {
+        "round": 3,
+        "name": "search_code",
+        "arguments": {
+          "query": "fnmatch.translate",
+          "path_prefix": ""
+        },
+        "ok": true
+      },
+      {
+        "round": 4,
+        "name": "find_test_files",
+        "arguments": {
+          "source_path": "pathspec/patterns/gitwildmatch.py"
+        },
+        "ok": true
+      },
+      {
+        "round": 5,
+        "name": "read_file",
+        "arguments": {
+          "path": "tests/test_gitwildmatch.py"
+        },
+        "ok": true
+      }
+    ],
+    "submissions": [
+      {
+        "round": 6,
+        "accepted": true,
+        "problems": [],
+        "decision": "selected"
+      }
+    ],
+    "exploration_calls": 5,
+    "file_fetches": 17
+  },
+  "manifest": null,
+  "usage": {
+    "eligibility": {
+      "requests": 1,
+      "input_tokens": 797,
+      "output_tokens": 806
+    },
+    "discovery": {
+      "requests": 6,
+      "input_tokens": 42625,
+      "output_tokens": 1186
+    },
+    "patch_generation": {
+      "requests": 1,
+      "input_tokens": 10231,
+      "output_tokens": 2264
+    }
+  },
+  "patch_sha256": null,
+  "warning": "Automated decisions and any draft patch are unverified. Review before running the Docker sandbox with --approve."
+}

@@ -1,0 +1,44 @@
+{
+  "status": "patched_tests_passed",
+  "patch_check": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "baseline": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "........................................................................ [ 24%]\n........................................................................ [ 49%]\n........................................................................ [ 74%]\n........................................................................ [ 98%]\n...                                                                      [100%]\n291 passed in 4.21s\n\n",
+    "timed_out": false
+  },
+  "patch_apply": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "patched": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "........................................................................ [ 24%]\n........................................................................ [ 49%]\n........................................................................ [ 73%]\n........................................................................ [ 98%]\n....                                                                     [100%]\n292 passed in 4.20s\n\n",
+    "timed_out": false
+  },
+  "test_command": [
+    "python",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+  "source": {
+    "files": 27,
+    "bytes": 206396
+  },
+  "provenance": {
+    "base_commit": "16e88894ef7d79b25a68f5a3b5411ed881342725",
+    "repository": "tkem/cachetools",
+    "files_checked": 2,
+    "patch_sha256": "41d9cc4f26f2eb0a4c417643cb61a79b69284ef7e70d08e3f9711d9a29333afe"
+  }
+}

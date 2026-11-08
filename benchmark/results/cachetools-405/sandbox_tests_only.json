@@ -1,0 +1,38 @@
+{
+  "status": "patched_tests_failed",
+  "patch_check": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "baseline": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "........................................................................ [ 24%]\n........................................................................ [ 49%]\n........................................................................ [ 74%]\n........................................................................ [ 98%]\n...                                                                      [100%]\n291 passed in 4.20s\n\n",
+    "timed_out": false
+  },
+  "patch_apply": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "patched": {
+    "passed": false,
+    "exit_code": 1,
+    "output": "........................................................................ [ 24%]\n........................................................................ [ 49%]\n............................................................F........... [ 73%]\n........................................................................ [ 98%]\n....                                                                     [100%]\n=================================== FAILURES ===================================\n_________________ LRUCacheTest.test_lru_update_grow_getsizeof __________________\n\nself = <tests.test_lru.LRUCacheTest testMethod=test_lru_update_grow_getsizeof>\n\n    def test_lru_update_grow_getsizeof(self):\n        # Regression test: growing an existing key should not over-evict\n        cache = LRUCache[int, int](maxsize=10, getsizeof=lambda v: v)\n    \n        cache[\"a\"] = 3\n        cache[\"b\"] = 3          # currsize == 6\n        cache[\"b\"] = 7          # grow \"b\"; final size would be a(3) + b(7) == 10 == maxsize\n    \n>       self.assertEqual(dict(cache), {\"a\": 3, \"b\": 7})\nE       AssertionError: {'b': 7} != {'a': 3, 'b': 7}\nE       - {'b': 7}\nE       + {'a': 3, 'b': 7}\n\ntests/test_lru.py:66: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_lru.py::LRUCacheTest::test_lru_update_grow_getsizeof - Asse...\n1 failed, 291 passed in 4.20s\n\n",
+    "timed_out": false
+  },
+  "test_command": [
+    "python",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+  "source": {
+    "files": 27,
+    "bytes": 206396
+  }
+}

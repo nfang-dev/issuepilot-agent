@@ -1,0 +1,11 @@
+{
+  "case": "dotenv-697",
+  "issue_url": "https://github.com/theskumar/python-dotenv/issues/697",
+  "base_commit": "a00cb2eed0704cd6d2071b2004c37e95ccc86ee5",
+  "pipeline": {
+    "exit_code": 5,
+    "seconds": 82.6,
+    "stdout_tail": "Status: patch_failed (stage: patch_generation)\nDetail: Model did not return valid structured edit JSON\nSelected source files: src/dotenv/cli.py, src/dotenv/main.py\nSelected test files: tests/test_cli.py\nRun record: /Users/nanfang/Desktop/issuepilot-agent/benchmark/results/dotenv-697/run.json\n",
+    "stderr_tail": ""
+  }
+}

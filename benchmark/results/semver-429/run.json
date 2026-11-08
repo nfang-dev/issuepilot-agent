@@ -1,0 +1,125 @@
+{
+  "status": "unsupported",
+  "stage": "discovery",
+  "issue_url": "https://github.com/python-semver/python-semver/issues/429",
+  "repository": "python-semver/python-semver",
+  "revision": "1f086326baf587a391c489cabc43e189b17d8fb6",
+  "detail": "The bug described in Issue #429 is in the documentation example (docs/advanced/combine-pydantic-and-semver.rst) where the example uses the wrong Pydantic core_schema serialization function. The required change is to the .rst documentation (replace serialization = core_schema.to_json_schema() or similar with core_schema.to_string_ser_schema()), not a change to any Python library source. A search of the Python source for the identifiers referenced in the issue (ManifestVersion, to_string_ser_schema) returned no matches in the .py files, indicating the faulty code is in docs rather than in src/*.py. Therefore the fix should be made to the documentation rather than any library code in this repository.",
+  "eligibility": {
+    "status": "eligible",
+    "reasons": [
+      {
+        "code": "category_logic_bug",
+        "detail": "Supported Python logic bug."
+      }
+    ],
+    "category": "logic_bug",
+    "confidence": "high",
+    "rationale": "The report documents a bug in Python example code (ManifestVersion) that causes an AttributeError during Pydantic serialization. It includes a minimal reproduction and expected vs actual behavior plus a specific code change that fixes the serialization. This is a logic bug in Python code (example/library usage) rather than a request for new behavior or documentation-only wording change.",
+    "mentioned_symbols": [
+      "ManifestVersion",
+      "Version",
+      "TypeAdapter",
+      "dump_json",
+      "dump_python",
+      "PydanticSerializationError",
+      "core_schema",
+      "to_string_ser_schema"
+    ],
+    "signals": {
+      "repository_language": "Python",
+      "python_files": 28,
+      "library_python_files": 7,
+      "tree_truncated": false,
+      "labels": [],
+      "blocking_labels": [],
+      "bug_labels": [],
+      "issue_state": "closed",
+      "explicit_revision": true
+    },
+    "model_consulted": true,
+    "human_override": false
+  },
+  "discovery": {
+    "status": "unsupported",
+    "reason": "model_unsupported",
+    "revision": "1f086326baf587a391c489cabc43e189b17d8fb6",
+    "source_files": [],
+    "test_files": [],
+    "confidence": "high",
+    "rationale": "The bug described in Issue #429 is in the documentation example (docs/advanced/combine-pydantic-and-semver.rst) where the example uses the wrong Pydantic core_schema serialization function. The required change is to the .rst documentation (replace serialization = core_schema.to_json_schema() or similar with core_schema.to_string_ser_schema()), not a change to any Python library source. A search of the Python source for the identifiers referenced in the issue (ManifestVersion, to_string_ser_schema) returned no matches in the .py files, indicating the faulty code is in docs rather than in src/*.py. Therefore the fix should be made to the documentation rather than any library code in this repository.",
+    "evidence": [
+      {
+        "path": "docs/advanced/combine-pydantic-and-semver.rst",
+        "detail": "Issue points to this documentation file as containing the incorrect example; the proposed fix in the issue replaces the serialization schema with core_schema.to_string_ser_schema() in that file."
+      },
+      {
+        "path": "search:ManifestVersion",
+        "detail": "search_code returned no matches for 'ManifestVersion' in the repository .py files (tool result: zero matches)."
+      },
+      {
+        "path": "search:to_string_ser_schema",
+        "detail": "search_code returned no matches for 'to_string_ser_schema' in the repository .py files (tool result: zero matches)."
+      }
+    ],
+    "provisional": {
+      "source_files": [],
+      "test_files": []
+    },
+    "warnings": [],
+    "tool_calls": [
+      {
+        "round": 1,
+        "name": "search_code",
+        "arguments": {
+          "query": "ManifestVersion",
+          "path_prefix": ""
+        },
+        "ok": true
+      },
+      {
+        "round": 2,
+        "name": "search_code",
+        "arguments": {
+          "query": "combine-pydantic",
+          "path_prefix": ""
+        },
+        "ok": true
+      },
+      {
+        "round": 3,
+        "name": "search_code",
+        "arguments": {
+          "query": "to_string_ser_schema",
+          "path_prefix": ""
+        },
+        "ok": true
+      }
+    ],
+    "submissions": [
+      {
+        "round": 4,
+        "accepted": true,
+        "problems": [],
+        "decision": "unsupported"
+      }
+    ],
+    "exploration_calls": 3,
+    "file_fetches": 12
+  },
+  "manifest": null,
+  "usage": {
+    "eligibility": {
+      "requests": 1,
+      "input_tokens": 976,
+      "output_tokens": 758
+    },
+    "discovery": {
+      "requests": 4,
+      "input_tokens": 9138,
+      "output_tokens": 1844
+    }
+  },
+  "patch_sha256": null,
+  "warning": "Automated decisions and any draft patch are unverified. Review before running the Docker sandbox with --approve."
+}

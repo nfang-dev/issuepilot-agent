@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "draft_unverified",
+  "repository": "cpburnz/python-pathspec",
+  "issue_url": "https://github.com/cpburnz/python-pathspec/issues/84",
+  "base_commit": "37e289515fbae7e92077a2438996046e79cae5bf",
+  "model": "gpt-5-mini",
+  "source_sha256": {
+    "pathspec/pathspec.py": "16bf4e47754efba4635915aa8c1dbe0c81f885b548e63799df74eec757894268",
+    "tests/test_03_pathspec.py": "3fc788d71718179b5c8a00e14b3733eadb40bd9aa882a394b3eb97847d06f03d"
+  },
+  "patch_sha256": "71edf67d4e0d40a86ff5fdb3080ddcd592f233788fec6729481ba4e968331618",
+  "selected_files": [
+    "pathspec/pathspec.py",
+    "tests/test_03_pathspec.py"
+  ],
+  "modified_files": [
+    "pathspec/pathspec.py",
+    "tests/test_03_pathspec.py"
+  ],
+  "summary": "Coerce Optional[bool] to bool in PathSpec.match_file() so it returns False (not None) when no patterns match. Add a regression test asserting match_file() returns False for an empty spec.",
+  "risks": "Very small. Only changes PathSpec.match_file() return value by wrapping include in bool(); other APIs that rely on CheckResult (which permits include to be None) are unaffected. Some callers that previously relied on distinguishing None vs False from match_file() (if any) would now always get a bool.",
+  "regression_tests": [
+    "tests/test_03_pathspec.py::PathSpecTest::test_05a_match_file_returns_bool_when_no_match"
+  ],
+  "warning": "LLM patch draft. Not applied, tested, or approved. Review before Docker execution.",
+  "selection": {
+    "mode": "automatic",
+    "source_files": [
+      "pathspec/pathspec.py"
+    ],
+    "test_files": [
+      "tests/test_03_pathspec.py"
+    ],
+    "eligibility_category": "logic_bug",
+    "discovery_confidence": "high"
+  }
+}

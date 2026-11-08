@@ -1,0 +1,20 @@
+diff --git a/tests/test_cli.py b/tests/test_cli.py
+--- a/tests/test_cli.py
++++ b/tests/test_cli.py
+@@ -66,6 +66,16 @@
+     result = cli.invoke(dotenv_cli, ["--file", dotenv_path, "get", "a"])
+ 
+     assert (result.exit_code, result.output) == (0, "b\n")
++
++
++def test_get_empty_value(cli, dotenv_path):
++    # Key exists with an explicit empty value — should be treated as present
++    # and print an empty line with exit code 0.
++    dotenv_path.write_text("a=")
++
++    result = cli.invoke(dotenv_cli, ["--file", dotenv_path, "get", "a"])
++
++    assert (result.exit_code, result.output) == (0, "\n")
+ 
+ 
+ def test_get_non_existent_value(cli, dotenv_path):

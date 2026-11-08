@@ -1,0 +1,44 @@
+{
+  "status": "patched_tests_passed",
+  "patch_check": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "baseline": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "........................................................................ [ 67%]\n..................................                                       [100%]\n106 passed in 0.04s\n\n",
+    "timed_out": false
+  },
+  "patch_apply": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "patched": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "........................................................................ [ 67%]\n...................................                                      [100%]\n107 passed in 0.04s\n\n",
+    "timed_out": false
+  },
+  "test_command": [
+    "python",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+  "source": {
+    "files": 33,
+    "bytes": 197776
+  },
+  "provenance": {
+    "base_commit": "37e289515fbae7e92077a2438996046e79cae5bf",
+    "repository": "cpburnz/python-pathspec",
+    "files_checked": 2,
+    "patch_sha256": "71edf67d4e0d40a86ff5fdb3080ddcd592f233788fec6729481ba4e968331618"
+  }
+}

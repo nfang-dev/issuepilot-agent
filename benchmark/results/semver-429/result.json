@@ -1,0 +1,11 @@
+{
+  "case": "semver-429",
+  "issue_url": "https://github.com/python-semver/python-semver/issues/429",
+  "base_commit": "1f086326baf587a391c489cabc43e189b17d8fb6",
+  "pipeline": {
+    "exit_code": 3,
+    "seconds": 30.5,
+    "stdout_tail": "Status: unsupported (stage: discovery)\nDetail: The bug described in Issue #429 is in the documentation example (docs/advanced/combine-pydantic-and-semver.rst) where the example uses the wrong Pydantic core_schema serialization function. The required change is to the .rst documentation (replace serialization = core_schema.to_json_schema() or similar with core_schema.to_string_ser_schema()), not a change to any Python library source. A search of the Python source for the identifiers referenced in the issue (ManifestVersion, to_string_ser_schema) returned no matches in the .py files, indicating the faulty code is in docs rather than in src/*.py. Therefore the fix should be made to the documentation rather than any library code in this repository.\nRun record: /Users/nanfang/Desktop/issuepilot-agent/benchmark/results/semver-429/run.json\n",
+    "stderr_tail": ""
+  }
+}

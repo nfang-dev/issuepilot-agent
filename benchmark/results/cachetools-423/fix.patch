@@ -1,0 +1,36 @@
+diff --git a/src/cachetools/__init__.py b/src/cachetools/__init__.py
+--- a/src/cachetools/__init__.py
++++ b/src/cachetools/__init__.py
+@@ -357,12 +357,10 @@
+ 
+     def popitem(self):
+         """Remove and return a random `(key, value)` pair."""
+-        try:
+-            key = self.__choice(self.__keys)
+-        except IndexError:
++        if not self.__keys:
+             raise KeyError("%s is empty" % type(self).__name__) from None
+-        else:
+-            return (key, self.pop(key))
++        key = self.__choice(self.__keys)
++        return (key, self.pop(key))
+ 
+     def clear(self):
+         Cache.clear(self)
+diff --git a/tests/test_rr.py b/tests/test_rr.py
+--- a/tests/test_rr.py
++++ b/tests/test_rr.py
+@@ -83,6 +83,13 @@
+         self.assertIn(2, cache)
+         self.assertNotIn(3, cache)
+ 
++    def test_popitem_empty_raises_keyerror(self):
++        # choice=min raises ValueError on empty sequences; popitem should
++        # still raise KeyError when the cache is empty.
++        cache = RRCache[int, int](maxsize=2, choice=min)
++        with self.assertRaises(KeyError):
++            cache.popitem()
++
+     def test_rr_default_choice(self):
+         cache = RRCache[int, int](maxsize=2)
+         self.assertIs(cache.choice, random.choice)
