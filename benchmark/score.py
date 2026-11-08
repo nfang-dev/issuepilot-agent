@@ -21,6 +21,10 @@ def main(results: Path = BENCH_DIR / "results") -> None:
         run_file = folder / "run.json"
         run = json.loads(run_file.read_text()) if run_file.exists() else None
         rows.append(score_case(case, result, run))
+    if not rows:
+        print("No results yet. Run: python benchmark/run.py")
+        return
+    results.mkdir(parents=True, exist_ok=True)
     summary = summarize(rows)
     (results / "summary.json").write_text(json.dumps({"summary": summary, "cases": rows}, indent=2))
     markdown = render_markdown(summary, rows)
