@@ -1,0 +1,244 @@
+{
+  "benchmark": "issuepilot-holdout-v1",
+  "selection_rule": "(fixed 2026-11-08, before selection):\n  Repositories are scanned in REPOS order. For each repository, closed issues\n  (closed as completed, since 2021-01-01, newest first, up to 300) are examined.\n  An issue qualifies only if exactly one merged pull request closed it.\n  * Positive case: the PR changes 1-2 non-test .py files with at most 30 changed\n    lines in them, changes at least one test file, and every touched .py file\n    is <= 24,000 bytes at the base commit (first parent of the merge commit).\n  * Negative case: the PR changes no .py files at all (e.g. docs only) and the\n    issue has no label that IssuePilot's deterministic gate already rejects,\n    so the model has to decide.\n  Take up to 2 positives and 1 negative per repository, stopping at 10\n  positives and 3 negatives in total.",
+  "cases": [
+    {
+      "id": "packaging-938",
+      "repo": "pypa/packaging",
+      "issue": 938,
+      "summary": "Invalid version error with evaluating markers",
+      "fix_commit": "b002be54d39b675840ebbe725345a28195492bd4",
+      "base_commit": "b20096ccce1ca389fa1d3c4290065ab4ede370cc",
+      "fix_pr": 939,
+      "labels": [],
+      "expected_eligibility": "eligible",
+      "category": "bug_fix",
+      "gold_source_files": [
+        "src/packaging/markers.py"
+      ],
+      "gold_test_files": [
+        "tests/test_markers.py"
+      ]
+    },
+    {
+      "id": "packaging-660",
+      "repo": "pypa/packaging",
+      "issue": 660,
+      "summary": "`parse_wheel_name` and `parse_sdist_filename` now raises `InvalidVersion`",
+      "fix_commit": "524b701c6e30fc4da9355117367273f591c6de72",
+      "base_commit": "b509bef6a4573595b23a97ecbfe569000918157f",
+      "fix_pr": 721,
+      "labels": [
+        "bug",
+        "packaging.utils"
+      ],
+      "expected_eligibility": "eligible",
+      "category": "bug_fix",
+      "gold_source_files": [
+        "src/packaging/utils.py"
+      ],
+      "gold_test_files": [
+        "tests/test_utils.py"
+      ]
+    },
+    {
+      "id": "markdown-it-py-415",
+      "repo": "executablebooks/markdown-it-py",
+      "issue": 415,
+      "summary": "IndexError: table inside a blockquote at end of input (html_block.py, heading.py)",
+      "fix_commit": "1b7ef6563902ab22deb8d4f3a9ce519bc382d190",
+      "base_commit": "c92ed7b02d090a900abfc1f683b919a9e37806f9",
+      "fix_pr": 416,
+      "labels": [],
+      "expected_eligibility": "eligible",
+      "category": "bug_fix",
+      "gold_source_files": [
+        "markdown_it/rules_block/heading.py",
+        "markdown_it/rules_block/html_block.py"
+      ],
+      "gold_test_files": [
+        "tests/test_fuzzer.py"
+      ]
+    },
+    {
+      "id": "markdown-it-py-352",
+      "repo": "executablebooks/markdown-it-py",
+      "issue": 352,
+      "summary": "[3.0.0] Command `markdown-it` does not allow activating support for tables? :cry:",
+      "fix_commit": "c02f6b1fcd6af070f0fa82b5758f5b36e3e814ee",
+      "base_commit": "d9b0526122d793a2157be689633114525a761e4e",
+      "fix_pr": 425,
+      "labels": [],
+      "expected_eligibility": "eligible",
+      "category": "bug_fix",
+      "gold_source_files": [
+        "markdown_it/cli/parse.py"
+      ],
+      "gold_test_files": [
+        "tests/test_cli.py"
+      ]
+    },
+    {
+      "id": "tomli-223",
+      "repo": "hukkin/tomli",
+      "issue": 223,
+      "summary": "Incorrect error message",
+      "fix_commit": "4e245a4bbbefed99e550e196095ea65c851cf31d",
+      "base_commit": "facdab0f5aacc5eb223753c42604d5de7bdaee9d",
+      "fix_pr": 229,
+      "labels": [
+        "enhancement"
+      ],
+      "expected_eligibility": "eligible",
+      "category": "bug_fix",
+      "gold_source_files": [
+        "src/tomli/_parser.py"
+      ],
+      "gold_test_files": [
+        "tests/test_error.py"
+      ]
+    },
+    {
+      "id": "tomli-1",
+      "repo": "hukkin/tomli",
+      "issue": 1,
+      "summary": "Parse `decimal.Decimal`",
+      "fix_commit": "5ab9ec926d9dc1ef79e66215edd51285371fe8a0",
+      "base_commit": "37a543b74bb1633478aea9f3a6a450a550bdeb63",
+      "fix_pr": 2,
+      "labels": [
+        "enhancement"
+      ],
+      "expected_eligibility": "eligible",
+      "category": "bug_fix",
+      "gold_source_files": [
+        "tomli/_parser.py"
+      ],
+      "gold_test_files": [
+        "tests/test_misc.py"
+      ]
+    },
+    {
+      "id": "mdformat-507",
+      "repo": "hukkin/mdformat",
+      "issue": 507,
+      "summary": "Warning on CLI argument default",
+      "fix_commit": "56e221da358612cbae25c7dde371f30607ded566",
+      "base_commit": "6b47904826b107356cd34509d2cc4f74455798eb",
+      "fix_pr": 512,
+      "labels": [
+        "enhancement"
+      ],
+      "expected_eligibility": "eligible",
+      "category": "bug_fix",
+      "gold_source_files": [
+        "src/mdformat/_cli.py"
+      ],
+      "gold_test_files": [
+        "tests/test_plugins.py"
+      ]
+    },
+    {
+      "id": "mdformat-357",
+      "repo": "hukkin/mdformat",
+      "issue": 357,
+      "summary": "Do not update the timestamp of the files when they are left unchanged",
+      "fix_commit": "ea12429222f5652daac999467c3084bd6e6fae8d",
+      "base_commit": "1493e57e29b143df84afcde5d199f9fc4c3e5c9e",
+      "fix_pr": 358,
+      "labels": [
+        "bug"
+      ],
+      "expected_eligibility": "eligible",
+      "category": "bug_fix",
+      "gold_source_files": [
+        "src/mdformat/_util.py"
+      ],
+      "gold_test_files": [
+        "tests/test_api.py",
+        "tests/test_cli.py"
+      ]
+    },
+    {
+      "id": "markupsafe-417",
+      "repo": "pallets/markupsafe",
+      "issue": 417,
+      "summary": "Markup.striptags: comments now get replaced with a space",
+      "fix_commit": "60a6512315d0ce05e6788808f80be526f2084b3f",
+      "base_commit": "73e6a4886564a554c4a19983d29c97f9fc95457d",
+      "fix_pr": 418,
+      "labels": [],
+      "expected_eligibility": "eligible",
+      "category": "bug_fix",
+      "gold_source_files": [
+        "src/markupsafe/__init__.py"
+      ],
+      "gold_test_files": [
+        "tests/test_markupsafe.py"
+      ]
+    },
+    {
+      "id": "markupsafe-310",
+      "repo": "pallets/markupsafe",
+      "issue": 310,
+      "summary": "`striptags` doesn't remove tags containing newlines",
+      "fix_commit": "58fafb063997c5025c98cf9a025dee3e20d01674",
+      "base_commit": "0e366be90424816156802b41997b37b5dadd0851",
+      "fix_pr": 311,
+      "labels": [],
+      "expected_eligibility": "eligible",
+      "category": "bug_fix",
+      "gold_source_files": [
+        "src/markupsafe/__init__.py"
+      ],
+      "gold_test_files": [
+        "tests/test_markupsafe.py"
+      ]
+    },
+    {
+      "id": "packaging-1185",
+      "repo": "pypa/packaging",
+      "issue": 1185,
+      "summary": "Validate `packages.index` is a URL in `pylock.toml`",
+      "fix_commit": "2497782b2bb03812d2a12ae882a4390c61ec5061",
+      "base_commit": "abf000549c2ec5b31357046498d6e4f0f9d7d743",
+      "fix_pr": 1339,
+      "labels": [
+        "bug",
+        "packaging.pylock"
+      ],
+      "expected_eligibility": "unsupported",
+      "category": "negative_no_python_change",
+      "gold_source_files": [],
+      "gold_test_files": []
+    },
+    {
+      "id": "tenacity-523",
+      "repo": "jd/tenacity",
+      "issue": 523,
+      "summary": "setuptools deprecation warnings",
+      "fix_commit": "8779333a4759e56427b5d7ba23cacd3fe6054d61",
+      "base_commit": "1106b9a168c561a5a8b50d97ba6a997ad4483d39",
+      "fix_pr": 637,
+      "labels": [],
+      "expected_eligibility": "unsupported",
+      "category": "negative_no_python_change",
+      "gold_source_files": [],
+      "gold_test_files": []
+    },
+    {
+      "id": "markdown-it-py-295",
+      "repo": "executablebooks/markdown-it-py",
+      "issue": 295,
+      "summary": "Default configuration is unsafe, contrary to documentation",
+      "fix_commit": "3613e8016ecafe21709471ee0032a90a4157c2d1",
+      "base_commit": "14cca384e608c49d205866347d66e35cb2b66ff9",
+      "fix_pr": 296,
+      "labels": [],
+      "expected_eligibility": "unsupported",
+      "category": "negative_no_python_change",
+      "gold_source_files": [],
+      "gold_test_files": []
+    }
+  ]
+}
