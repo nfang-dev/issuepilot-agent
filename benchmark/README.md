@@ -74,6 +74,7 @@ The 8 cases above are now the **development set**: their results have been read 
 2. **One run.** `run.py --cases benchmark/holdout.json --results benchmark/results-holdout` runs every holdout case once with the frozen code. No prompt or code changes between holdout cases, and no re-runs to improve scores.
 3. **Baseline.** `baseline.py` runs an LLM-only file-localization baseline on both sets: same model, issue text and pinned commit, the full list of Python files, one structured call, no tools, no file contents, no evidence validation. It answers whether the tool-using agent localizes files better than a single prompt.
 4. **Reporting.** Dev and holdout results are reported separately; the headline numbers come from the holdout set.
+5. **Pre-run review.** See [`holdout_review.md`](holdout_review.md): three positives are maintainer-labelled `enhancement` (eligibility reported both ways), and generic test dependencies were added to the sandbox image. No case was changed.
 
 ## Known limitations (declared up front)
 
