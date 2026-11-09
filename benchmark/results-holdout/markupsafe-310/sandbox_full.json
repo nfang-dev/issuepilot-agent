@@ -1,0 +1,44 @@
+{
+  "status": "patched_tests_passed",
+  "patch_check": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "baseline": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "................sssssssssssssssss...................                     [100%]\n35 passed, 17 skipped in 0.02s\n\n",
+    "timed_out": false
+  },
+  "patch_apply": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "patched": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "................sssssssssssssssss....................                    [100%]\n36 passed, 17 skipped in 0.02s\n\n",
+    "timed_out": false
+  },
+  "test_command": [
+    "python",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+  "source": {
+    "files": 33,
+    "bytes": 49258
+  },
+  "provenance": {
+    "base_commit": "0e366be90424816156802b41997b37b5dadd0851",
+    "repository": "pallets/markupsafe",
+    "files_checked": 2,
+    "patch_sha256": "4ee9a322756d253c24ff87d2f41bc428fb938a04f3c84a6556886e0a88754736"
+  }
+}

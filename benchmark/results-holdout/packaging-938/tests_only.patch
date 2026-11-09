@@ -1,0 +1,16 @@
+diff --git a/tests/test_markers.py b/tests/test_markers.py
+--- a/tests/test_markers.py
++++ b/tests/test_markers.py
+@@ -266,6 +266,12 @@
+     def test_environment_assumes_empty_extra(self) -> None:
+         assert Marker('extra == "im_valid"').evaluate() is False
+ 
++    def test_extra_version_like_name(self) -> None:
++        # Version-like extra names shouldn't cause version parsing of empty lhs.
++        m = Marker('extra == "v2"')
++        assert m.evaluate() is False
++        assert m.evaluate({"extra": "v2"}) is True
++
+     def test_environment_with_extra_none(self) -> None:
+         # GIVEN
+         marker_str = 'extra == "im_valid"'

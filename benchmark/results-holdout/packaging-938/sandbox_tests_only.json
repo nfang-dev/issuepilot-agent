@@ -1,0 +1,38 @@
+{
+  "status": "patched_tests_failed",
+  "patch_check": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "baseline": {
+    "passed": false,
+    "exit_code": 2,
+    "output": "\n==================================== ERRORS ====================================\n____________________ ERROR collecting tests/test_elffile.py ____________________\ntests/test_elffile.py:11: in <module>\n    BIN_MUSL_X86_64 = DIR_MUSLLINUX.joinpath(\"musl-x86_64\").read_bytes()\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        DIR_MANYLINUX = PosixPath('/work/repo/tests/manylinux')\n        DIR_MUSLLINUX = PosixPath('/work/repo/tests/musllinux')\n        EIClass    = <enum 'EIClass'>\n        EIData     = <enum 'EIData'>\n        ELFFile    = <class 'packaging._elffile.ELFFile'>\n        ELFInvalid = <class 'packaging._elffile.ELFInvalid'>\n        EMachine   = <enum 'EMachine'>\n        __builtins__ = <builtins>\n        __cached__ = '/work/repo/tests/__pycache__/test_elffile.cpython-312.pyc'\n        __doc__    = None\n        __file__   = '/work/repo/tests/test_elffile.py'\n        __loader__ = <_pytest.assertion.rewrite.AssertionRewritingHook object at 0xffffb82f5a30>\n        __name__   = 'tests.test_elffile'\n        __package__ = 'tests'\n        __spec__   = ModuleSpec(name='tests.test_elffile', loader=<_pytest.assertion.rewrite.AssertionRewritingHook object at 0xffffb82f5a30>, origin='/work/repo/tests/test_elffile.py')\n        io         = <module 'io' (frozen)>\n        pathlib    = <module 'pathlib' from '/usr/local/lib/python3.12/pathlib.py'>\n        pytest     = <module 'pytest' from '/usr/local/lib/python3.12/site-packages/pytest/__init__.py'>\n        struct     = <module 'struct' from '/usr/local/lib/python3.12/struct.py'>\n/usr/local/lib/python3.12/pathlib.py:1019: in read_bytes\n    with self.open(mode='rb') as f:\n         ^^^^^^^^^^^^^^^^^^^^\n        self       = PosixPath('/work/repo/tests/musllinux/musl-x86_64')\n/usr/local/lib/python3.12/pathlib.py:1013: in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   FileNotFoundError: [Errno 2] No such file or directory: '/work/repo/tests/musllinux/musl-x86_64'\n        buffering  = -1\n        encoding   = None\n        errors     = None\n        mode       = 'rb'\n        newline    = None\n        self       = PosixPath('/work/repo/tests/musllinux/musl-x86_64')\n=========================== short test summary info ============================\nERROR tests/test_elffile.py - FileNotFoundError: [Errno 2] No such file or di...\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 error in 0.87s\n\n",
+    "timed_out": false
+  },
+  "patch_apply": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "patched": {
+    "passed": false,
+    "exit_code": 2,
+    "output": "\n==================================== ERRORS ====================================\n____________________ ERROR collecting tests/test_elffile.py ____________________\ntests/test_elffile.py:11: in <module>\n    BIN_MUSL_X86_64 = DIR_MUSLLINUX.joinpath(\"musl-x86_64\").read_bytes()\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        DIR_MANYLINUX = PosixPath('/work/repo/tests/manylinux')\n        DIR_MUSLLINUX = PosixPath('/work/repo/tests/musllinux')\n        EIClass    = <enum 'EIClass'>\n        EIData     = <enum 'EIData'>\n        ELFFile    = <class 'packaging._elffile.ELFFile'>\n        ELFInvalid = <class 'packaging._elffile.ELFInvalid'>\n        EMachine   = <enum 'EMachine'>\n        __builtins__ = <builtins>\n        __cached__ = '/work/repo/tests/__pycache__/test_elffile.cpython-312.pyc'\n        __doc__    = None\n        __file__   = '/work/repo/tests/test_elffile.py'\n        __loader__ = <_pytest.assertion.rewrite.AssertionRewritingHook object at 0xffff817b5a30>\n        __name__   = 'tests.test_elffile'\n        __package__ = 'tests'\n        __spec__   = ModuleSpec(name='tests.test_elffile', loader=<_pytest.assertion.rewrite.AssertionRewritingHook object at 0xffff817b5a30>, origin='/work/repo/tests/test_elffile.py')\n        io         = <module 'io' (frozen)>\n        pathlib    = <module 'pathlib' from '/usr/local/lib/python3.12/pathlib.py'>\n        pytest     = <module 'pytest' from '/usr/local/lib/python3.12/site-packages/pytest/__init__.py'>\n        struct     = <module 'struct' from '/usr/local/lib/python3.12/struct.py'>\n/usr/local/lib/python3.12/pathlib.py:1019: in read_bytes\n    with self.open(mode='rb') as f:\n         ^^^^^^^^^^^^^^^^^^^^\n        self       = PosixPath('/work/repo/tests/musllinux/musl-x86_64')\n/usr/local/lib/python3.12/pathlib.py:1013: in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   FileNotFoundError: [Errno 2] No such file or directory: '/work/repo/tests/musllinux/musl-x86_64'\n        buffering  = -1\n        encoding   = None\n        errors     = None\n        mode       = 'rb'\n        newline    = None\n        self       = PosixPath('/work/repo/tests/musllinux/musl-x86_64')\n=========================== short test summary info ============================\nERROR tests/test_elffile.py - FileNotFoundError: [Errno 2] No such file or di...\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 error in 0.87s\n\n",
+    "timed_out": false
+  },
+  "test_command": [
+    "python",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+  "source": {
+    "files": 65,
+    "bytes": 651774
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "status": "unsupported",
+  "stage": "eligibility",
+  "issue_url": "https://github.com/hukkin/mdformat/issues/507",
+  "repository": "hukkin/mdformat",
+  "revision": "6b47904826b107356cd34509d2cc4f74455798eb",
+  "detail": "Issue labels mark it as out of scope: enhancement.",
+  "eligibility": {
+    "status": "unsupported",
+    "reasons": [
+      {
+        "code": "blocking_label",
+        "detail": "Issue labels mark it as out of scope: enhancement."
+      }
+    ],
+    "category": null,
+    "confidence": null,
+    "rationale": "",
+    "mentioned_symbols": [],
+    "signals": {
+      "repository_language": "Python",
+      "python_files": 30,
+      "library_python_files": 17,
+      "tree_truncated": false,
+      "labels": [
+        "enhancement"
+      ],
+      "blocking_labels": [
+        "enhancement"
+      ],
+      "bug_labels": [],
+      "issue_state": "closed",
+      "explicit_revision": true
+    },
+    "model_consulted": false,
+    "human_override": false
+  },
+  "discovery": null,
+  "manifest": null,
+  "usage": {},
+  "patch_sha256": null,
+  "warning": "Automated decisions and any draft patch are unverified. Review before running the Docker sandbox with --approve."
+}

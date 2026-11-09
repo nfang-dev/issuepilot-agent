@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "status": "draft_unverified",
+  "repository": "executablebooks/markdown-it-py",
+  "issue_url": "https://github.com/executablebooks/markdown-it-py/issues/415",
+  "base_commit": "c92ed7b02d090a900abfc1f683b919a9e37806f9",
+  "model": "gpt-5-mini",
+  "source_sha256": {
+    "markdown_it/rules_block/html_block.py": "c00f296f7e0bb59af50642004e018a4012065f98d034e930665f54184aaf6f93",
+    "markdown_it/rules_block/heading.py": "e0b875e6bc2856c4231358558696e189d43493dc4a1e28608c079849bc203b99"
+  },
+  "patch_sha256": "30c0ebf9044918a22f3b258727c0a2f59d09dec9a4eb0ee7aafa84fb60631cc6",
+  "selected_files": [
+    "markdown_it/rules_block/html_block.py",
+    "markdown_it/rules_block/heading.py"
+  ],
+  "modified_files": [
+    "markdown_it/rules_block/heading.py",
+    "markdown_it/rules_block/html_block.py"
+  ],
+  "summary": "Prevent IndexError when a block-level terminator rule reads state.src[pos] for a line where pos == len(state.src). Wrap the html check in html_block with a try/except IndexError and adjust heading to check pos < maximum before indexing. This mirrors protections used in sibling rules.",
+  "risks": "Low. Changes only add a bounds check / try/except around a single character access or reorder an existing check to avoid out-of-range indexing. Behavior for normal inputs is unchanged. One small style change in heading removes an unused early ch binding; subsequent code initializes ch before use.",
+  "regression_tests": [
+    "def test_table_inside_blockquote_ending_with_marker_html_enabled():\n    md = MarkdownIt().enable(\"table\")\n    # previously raised IndexError\n    md.parse('> | a | b |\\n> |---|---|\\n>')\n\ndef test_table_inside_blockquote_ending_with_marker_html_disabled():\n    md = MarkdownIt(\"commonmark\", {\"html\": False}).enable(\"table\")\n    # previously raised IndexError (heading terminator)\n    md.parse('> | a | b |\\n> |---|---|\\n>')"
+  ],
+  "warning": "LLM patch draft. Not applied, tested, or approved. Review before Docker execution.",
+  "selection": {
+    "mode": "automatic",
+    "source_files": [
+      "markdown_it/rules_block/html_block.py",
+      "markdown_it/rules_block/heading.py"
+    ],
+    "test_files": [],
+    "eligibility_category": "crash_or_exception",
+    "discovery_confidence": "high"
+  }
+}

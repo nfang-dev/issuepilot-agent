@@ -1,0 +1,59 @@
+{
+  "status": "unsupported",
+  "stage": "eligibility",
+  "issue_url": "https://github.com/pypa/packaging/issues/1185",
+  "repository": "pypa/packaging",
+  "revision": "abf000549c2ec5b31357046498d6e4f0f9d7d743",
+  "detail": "Classified as feature_request.",
+  "eligibility": {
+    "status": "unsupported",
+    "reasons": [
+      {
+        "code": "category_feature_request",
+        "detail": "Classified as feature_request."
+      }
+    ],
+    "category": "feature_request",
+    "confidence": "medium",
+    "rationale": "The report asks for validation of URL-like fields (e.g. packages.index) in pylock.toml and includes a reproduction showing differing behaviour between pip and uv. Comments discuss whether packaging should validate and how (e.g. require scheme and netloc or be opt-in), which is a design decision rather than a straightforward crash fix. The issue concerns Python packaging code (packaging.pylock).",
+    "mentioned_symbols": [
+      "packages.index",
+      "pylock.toml",
+      "packaging.pylock",
+      "path",
+      "url",
+      "urllib.parse.urlsplit",
+      "pip",
+      "uv"
+    ],
+    "signals": {
+      "repository_language": "Python",
+      "python_files": 74,
+      "library_python_files": 31,
+      "tree_truncated": false,
+      "labels": [
+        "bug",
+        "packaging.pylock"
+      ],
+      "blocking_labels": [],
+      "bug_labels": [
+        "bug"
+      ],
+      "issue_state": "closed",
+      "explicit_revision": true
+    },
+    "model_consulted": true,
+    "human_override": false
+  },
+  "discovery": null,
+  "manifest": null,
+  "usage": {
+    "eligibility": {
+      "requests": 1,
+      "input_tokens": 1179,
+      "output_tokens": 768
+    }
+  },
+  "patch_sha256": null,
+  "warning": "Automated decisions and any draft patch are unverified. Review before running the Docker sandbox with --approve."
+}

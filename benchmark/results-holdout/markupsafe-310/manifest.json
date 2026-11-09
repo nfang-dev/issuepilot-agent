@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "draft_unverified",
+  "repository": "pallets/markupsafe",
+  "issue_url": "https://github.com/pallets/markupsafe/issues/310",
+  "base_commit": "0e366be90424816156802b41997b37b5dadd0851",
+  "model": "gpt-5-mini",
+  "source_sha256": {
+    "src/markupsafe/__init__.py": "7d5d1cb5b172187e8b3907f4353b1ba0b7550fa25061dda447d779c5593ed335",
+    "tests/test_markupsafe.py": "5214fe3c88f2031a9c0c8ece75476302d8169e336affa4a32b61cf7dce5cfef6"
+  },
+  "patch_sha256": "4ee9a322756d253c24ff87d2f41bc428fb938a04f3c84a6556886e0a88754736",
+  "selected_files": [
+    "src/markupsafe/__init__.py",
+    "tests/test_markupsafe.py"
+  ],
+  "modified_files": [
+    "src/markupsafe/__init__.py",
+    "tests/test_markupsafe.py"
+  ],
+  "summary": "Make striptags remove tags and comments that contain newlines by compiling the tag/comment regexes with re.DOTALL. Add a regression test that demonstrates tags/comments with embedded newlines are removed.",
+  "risks": "Minimal. Changing the regex to use DOTALL will allow '.' to match newlines, which is the intended behavior for stripping multi-line tags/comments. The simple regex-based stripping is still not a full HTML parser, so edge cases involving malformed HTML may behave differently, but this change restores previous behavior and matches the reported expectation.",
+  "regression_tests": [
+    "test_striptags_newlines"
+  ],
+  "warning": "LLM patch draft. Not applied, tested, or approved. Review before Docker execution.",
+  "selection": {
+    "mode": "automatic",
+    "source_files": [
+      "src/markupsafe/__init__.py"
+    ],
+    "test_files": [
+      "tests/test_markupsafe.py"
+    ],
+    "eligibility_category": "logic_bug",
+    "discovery_confidence": "high"
+  }
+}

@@ -1,0 +1,180 @@
+{
+  "status": "draft_ready",
+  "stage": "patch_generation",
+  "issue_url": "https://github.com/pallets/markupsafe/issues/310",
+  "repository": "pallets/markupsafe",
+  "revision": "0e366be90424816156802b41997b37b5dadd0851",
+  "detail": "",
+  "eligibility": {
+    "status": "eligible",
+    "reasons": [
+      {
+        "code": "category_logic_bug",
+        "detail": "Supported Python logic bug."
+      }
+    ],
+    "category": "logic_bug",
+    "confidence": "high",
+    "rationale": "The report shows a regression in MarkupSafe's striptags behavior: tags and comments containing newlines are not removed, with a minimal reproducible example and suggested code change. This is a bug in Python library logic (incorrect output), not a crash, docs, or feature request. The fix is a straightforward change to the regex flags.",
+    "mentioned_symbols": [
+      "striptags",
+      "Markup",
+      "markupsafe",
+      "_strip_comments_re",
+      "_strip_tags_re",
+      "re",
+      "re.DOTALL"
+    ],
+    "signals": {
+      "repository_language": "Python",
+      "python_files": 15,
+      "library_python_files": 8,
+      "tree_truncated": false,
+      "labels": [],
+      "blocking_labels": [],
+      "bug_labels": [],
+      "issue_state": "closed",
+      "explicit_revision": true
+    },
+    "model_consulted": true,
+    "human_override": false
+  },
+  "discovery": {
+    "status": "selected",
+    "reason": "grounded_selection",
+    "revision": "0e366be90424816156802b41997b37b5dadd0851",
+    "source_files": [
+      "src/markupsafe/__init__.py"
+    ],
+    "test_files": [
+      "tests/test_markupsafe.py"
+    ],
+    "confidence": "high",
+    "rationale": "The bug describes that Markup.striptags fails to remove tags/comments containing newlines because the compiled regular expressions don't use DOTALL. The implementation is in src/markupsafe/__init__.py where _strip_comments_re and _strip_tags_re are compiled without re.DOTALL and striptags uses them to remove comments and tags. A regression test belongs in tests/test_markupsafe.py which already contains striptags tests; adding a test for tags/comments with embedded newlines fits there.",
+    "evidence": [
+      {
+        "path": "src/markupsafe/__init__.py",
+        "detail": "_strip_comments_re = re.compile(r\"<!--.*?-->\") and _strip_tags_re = re.compile(r\"<.*?>\") (missing re.DOTALL). In striptags(): value = _strip_comments_re.sub(\"\", self); value = _strip_tags_re.sub(\"\", value) -- this is where the behavior occurs."
+      },
+      {
+        "path": "tests/test_markupsafe.py",
+        "detail": "Existing test_test_escaping uses Markup(...).striptags() to assert removal of comments and tags, making this the appropriate test module to add a regression test for tags/comments containing newlines."
+      }
+    ],
+    "provisional": {},
+    "warnings": [],
+    "tool_calls": [
+      {
+        "round": 1,
+        "name": "search_code",
+        "arguments": {
+          "query": "striptags",
+          "path_prefix": ""
+        },
+        "ok": true
+      },
+      {
+        "round": 2,
+        "name": "read_file",
+        "arguments": {
+          "path": "src/markupsafe/__init__.py"
+        },
+        "ok": true
+      },
+      {
+        "round": 3,
+        "name": "search_code",
+        "arguments": {
+          "query": "striptags",
+          "path_prefix": ""
+        },
+        "cached": true,
+        "ok": true
+      },
+      {
+        "round": 4,
+        "name": "search_code",
+        "arguments": {
+          "query": "strip",
+          "path_prefix": "tests"
+        },
+        "ok": true
+      },
+      {
+        "round": 5,
+        "name": "read_file",
+        "arguments": {
+          "path": "tests/test_markupsafe.py"
+        },
+        "ok": true
+      }
+    ],
+    "submissions": [
+      {
+        "round": 6,
+        "accepted": true,
+        "problems": [],
+        "decision": "selected"
+      }
+    ],
+    "exploration_calls": 5,
+    "file_fetches": 15
+  },
+  "manifest": {
+    "schema_version": 1,
+    "status": "draft_unverified",
+    "repository": "pallets/markupsafe",
+    "issue_url": "https://github.com/pallets/markupsafe/issues/310",
+    "base_commit": "0e366be90424816156802b41997b37b5dadd0851",
+    "model": "gpt-5-mini",
+    "source_sha256": {
+      "src/markupsafe/__init__.py": "7d5d1cb5b172187e8b3907f4353b1ba0b7550fa25061dda447d779c5593ed335",
+      "tests/test_markupsafe.py": "5214fe3c88f2031a9c0c8ece75476302d8169e336affa4a32b61cf7dce5cfef6"
+    },
+    "patch_sha256": "4ee9a322756d253c24ff87d2f41bc428fb938a04f3c84a6556886e0a88754736",
+    "selected_files": [
+      "src/markupsafe/__init__.py",
+      "tests/test_markupsafe.py"
+    ],
+    "modified_files": [
+      "src/markupsafe/__init__.py",
+      "tests/test_markupsafe.py"
+    ],
+    "summary": "Make striptags remove tags and comments that contain newlines by compiling the tag/comment regexes with re.DOTALL. Add a regression test that demonstrates tags/comments with embedded newlines are removed.",
+    "risks": "Minimal. Changing the regex to use DOTALL will allow '.' to match newlines, which is the intended behavior for stripping multi-line tags/comments. The simple regex-based stripping is still not a full HTML parser, so edge cases involving malformed HTML may behave differently, but this change restores previous behavior and matches the reported expectation.",
+    "regression_tests": [
+      "test_striptags_newlines"
+    ],
+    "warning": "LLM patch draft. Not applied, tested, or approved. Review before Docker execution.",
+    "selection": {
+      "mode": "automatic",
+      "source_files": [
+        "src/markupsafe/__init__.py"
+      ],
+      "test_files": [
+        "tests/test_markupsafe.py"
+      ],
+      "eligibility_category": "logic_bug",
+      "discovery_confidence": "high"
+    }
+  },
+  "usage": {
+    "eligibility": {
+      "requests": 1,
+      "input_tokens": 729,
+      "output_tokens": 403
+    },
+    "discovery": {
+      "requests": 6,
+      "input_tokens": 25483,
+      "output_tokens": 1238
+    },
+    "patch_generation": {
+      "requests": 1,
+      "input_tokens": 4624,
+      "output_tokens": 1583
+    }
+  },
+  "patch_sha256": "4ee9a322756d253c24ff87d2f41bc428fb938a04f3c84a6556886e0a88754736",
+  "warning": "Automated decisions and any draft patch are unverified. Review before running the Docker sandbox with --approve."
+}

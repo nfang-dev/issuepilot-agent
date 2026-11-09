@@ -1,0 +1,25 @@
+diff --git a/src/packaging/utils.py b/src/packaging/utils.py
+--- a/src/packaging/utils.py
++++ b/src/packaging/utils.py
+@@ -121,7 +121,10 @@
+     if "__" in name_part or re.match(r"^[\w\d._]*$", name_part, re.UNICODE) is None:
+         raise InvalidWheelFilename(f"Invalid project name: {filename}")
+     name = canonicalize_name(name_part)
+-    version = Version(parts[1])
++    try:
++        version = Version(parts[1])
++    except InvalidVersion:
++        raise InvalidWheelFilename(f"Invalid version: {parts[1]} in '{filename}'")
+     if dashes == 5:
+         build_part = parts[2]
+         build_match = _build_tag_regex.match(build_part)
+@@ -154,5 +157,8 @@
+         raise InvalidSdistFilename(f"Invalid sdist filename: {filename}")
+ 
+     name = canonicalize_name(name_part)
+-    version = Version(version_part)
++    try:
++        version = Version(version_part)
++    except InvalidVersion:
++        raise InvalidSdistFilename(f"Invalid version: {version_part} in '{filename}'")
+     return (name, version)

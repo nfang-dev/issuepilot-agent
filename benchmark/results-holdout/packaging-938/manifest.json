@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "draft_unverified",
+  "repository": "pypa/packaging",
+  "issue_url": "https://github.com/pypa/packaging/issues/938",
+  "base_commit": "b20096ccce1ca389fa1d3c4290065ab4ede370cc",
+  "model": "gpt-5-mini",
+  "source_sha256": {
+    "src/packaging/markers.py": "224013cff18f02804483b31f401587720ce645249183f2f9603c0d6f6585f14e",
+    "tests/test_markers.py": "2781a2f716f312ffcb6aed04bb1602e58ca81a659cdc574f0762f9d519016a4b"
+  },
+  "patch_sha256": "a9227b5208ba6f2fbed4502cb05e9151310e6435f7c90821e2ee8a0d227b8013",
+  "selected_files": [
+    "src/packaging/markers.py",
+    "tests/test_markers.py"
+  ],
+  "modified_files": [
+    "src/packaging/markers.py",
+    "tests/test_markers.py"
+  ],
+  "summary": "Avoid attempting to coerce an empty string to a Version during marker evaluation. When a Specifier is successfully constructed for a string RHS, if the LHS is the empty string (which happens for 'extra' when no extra is selected), return False instead of calling spec.contains which triggers Version('') and raises InvalidVersion. Also add a regression test asserting that version-like extra names (e.g. 'v2') do not raise and evaluate as expected.",
+  "risks": "Minimal. The change only affects the branch where a string RHS parsed as a Specifier and the LHS is the empty string. It returns False in that case, which matches expected behaviour for extras. Other comparisons are unchanged.",
+  "regression_tests": [
+    "tests/test_markers.py::TestMarker::test_extra_version_like_name"
+  ],
+  "warning": "LLM patch draft. Not applied, tested, or approved. Review before Docker execution.",
+  "selection": {
+    "mode": "automatic",
+    "source_files": [
+      "src/packaging/markers.py"
+    ],
+    "test_files": [
+      "tests/test_markers.py"
+    ],
+    "eligibility_category": "logic_bug",
+    "discovery_confidence": "high"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "status": "patched_tests_failed",
+  "patch_check": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "baseline": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "................sssssssssssssssss...................                     [100%]\n35 passed, 17 skipped in 0.02s\n\n",
+    "timed_out": false
+  },
+  "patch_apply": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "patched": {
+    "passed": false,
+    "exit_code": 1,
+    "output": "................sssssssssssssssss...................F                    [100%]\n=================================== FAILURES ===================================\n___________________________ test_striptags_newlines ____________________________\n\n    def test_striptags_newlines():\n        # Comments and tags containing newlines should be removed entirely\n>       assert Markup(\"<!--\\n<br\\n>\\n-->\").striptags() == \"\"\nE       AssertionError: assert '<!-- <br > -->' == ''\nE         \nE         + <!-- <br > -->\n\ntests/test_markupsafe.py:199: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_markupsafe.py::test_striptags_newlines - AssertionError: as...\n1 failed, 35 passed, 17 skipped in 0.03s\n\n",
+    "timed_out": false
+  },
+  "test_command": [
+    "python",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+  "source": {
+    "files": 33,
+    "bytes": 49258
+  }
+}

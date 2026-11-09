@@ -1,0 +1,13 @@
+diff --git a/tests/test_markupsafe.py b/tests/test_markupsafe.py
+--- a/tests/test_markupsafe.py
++++ b/tests/test_markupsafe.py
+@@ -192,3 +192,9 @@
+     assert type(soft_str("")) is str
+     assert type(soft_str(Markup())) is Markup
+     assert type(soft_str(15)) is str
++
++
++def test_striptags_newlines():
++    # Comments and tags containing newlines should be removed entirely
++    assert Markup("<!--\n<br\n>\n-->").striptags() == ""
++    assert Markup("<br\n>").striptags() == ""

@@ -1,0 +1,15 @@
+diff --git a/tests/test_markupsafe.py b/tests/test_markupsafe.py
+--- a/tests/test_markupsafe.py
++++ b/tests/test_markupsafe.py
+@@ -82,6 +82,11 @@
+     )
+ 
+ 
++def test_striptags_comment_removal():
++    value = 'x <!-- comment -->'
++    assert Markup(value).striptags() == 'x'
++
++
+ def test_unescape():
+     assert Markup("&lt;test&gt;").unescape() == "<test>"
+ 

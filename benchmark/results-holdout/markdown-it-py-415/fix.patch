@@ -1,0 +1,29 @@
+diff --git a/markdown_it/rules_block/heading.py b/markdown_it/rules_block/heading.py
+--- a/markdown_it/rules_block/heading.py
++++ b/markdown_it/rules_block/heading.py
+@@ -19,9 +19,7 @@
+     if state.is_code_block(startLine):
+         return False
+ 
+-    ch: str | None = state.src[pos]
+-
+-    if ch != "#" or pos >= maximum:
++    if pos >= maximum or state.src[pos] != "#":
+         return False
+ 
+     # count heading level
+diff --git a/markdown_it/rules_block/html_block.py b/markdown_it/rules_block/html_block.py
+--- a/markdown_it/rules_block/html_block.py
++++ b/markdown_it/rules_block/html_block.py
+@@ -44,7 +44,10 @@
+     if not state.md.options.get("html", None):
+         return False
+ 
+-    if state.src[pos] != "<":
++    try:
++        if state.src[pos] != "<":
++            return False
++    except IndexError:
+         return False
+ 
+     lineText = state.src[pos:maximum]

@@ -1,0 +1,16 @@
+{
+  "case": "markdown-it-py-415",
+  "issue_url": "https://github.com/executablebooks/markdown-it-py/issues/415",
+  "base_commit": "c92ed7b02d090a900abfc1f683b919a9e37806f9",
+  "pipeline": {
+    "exit_code": 0,
+    "seconds": 47.4,
+    "stdout_tail": "Status: draft_ready (stage: patch_generation)\nSelected source files: markdown_it/rules_block/html_block.py, markdown_it/rules_block/heading.py\nSelected test files: (none)\nCreated unverified draft: benchmark/results-holdout/markdown-it-py-415/fix.patch\nPinned source SHA: c92ed7b02d090a900abfc1f683b919a9e37806f9\nManifest: benchmark/results-holdout/markdown-it-py-415/manifest.json\nReview the diff and check out the pinned revision before running Docker.\nRun record: benchmark/results-holdout/markdown-it-py-415/run.json\n",
+    "stderr_tail": ""
+  },
+  "patch_applies": true,
+  "sandbox_full": {
+    "status": "input_error",
+    "error": "Source exceeds sandbox staging size limits"
+  }
+}

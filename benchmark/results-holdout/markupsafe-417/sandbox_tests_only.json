@@ -1,0 +1,38 @@
+{
+  "status": "patched_tests_failed",
+  "patch_check": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "baseline": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "................sssssssssssssssss....................                    [100%]\n36 passed, 17 skipped in 0.02s\n\n",
+    "timed_out": false
+  },
+  "patch_apply": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "patched": {
+    "passed": false,
+    "exit_code": 1,
+    "output": "................sssssssssssssssss...........F.........                   [100%]\n=================================== FAILURES ===================================\n________________________ test_striptags_comment_removal ________________________\n\n    def test_striptags_comment_removal():\n        value = 'x <!-- comment -->'\n>       assert Markup(value).striptags() == 'x'\nE       AssertionError: assert 'x ' == 'x'\nE         \nE         - x\nE         + x\n\ntests/test_markupsafe.py:87: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_markupsafe.py::test_striptags_comment_removal - AssertionEr...\n1 failed, 36 passed, 17 skipped in 0.03s\n\n",
+    "timed_out": false
+  },
+  "test_command": [
+    "python",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+  "source": {
+    "files": 34,
+    "bytes": 53735
+  }
+}

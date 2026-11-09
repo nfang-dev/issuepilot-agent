@@ -1,0 +1,11 @@
+{
+  "case": "mdformat-357",
+  "issue_url": "https://github.com/hukkin/mdformat/issues/357",
+  "base_commit": "1493e57e29b143df84afcde5d199f9fc4c3e5c9e",
+  "pipeline": {
+    "exit_code": 5,
+    "seconds": 148.5,
+    "stdout_tail": "Status: patch_failed (stage: patch_generation)\nDetail: Empty, oversized, or ineffective replacement for tests/test_cli.py\nSelected source files: src/mdformat/_util.py\nSelected test files: tests/test_cli.py\nRun record: benchmark/results-holdout/mdformat-357/run.json\n",
+    "stderr_tail": ""
+  }
+}

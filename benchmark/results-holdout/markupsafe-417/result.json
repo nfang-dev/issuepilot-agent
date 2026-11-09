@@ -1,0 +1,94 @@
+{
+  "case": "markupsafe-417",
+  "issue_url": "https://github.com/pallets/markupsafe/issues/417",
+  "base_commit": "73e6a4886564a554c4a19983d29c97f9fc95457d",
+  "pipeline": {
+    "exit_code": 0,
+    "seconds": 69.4,
+    "stdout_tail": "Status: draft_ready (stage: patch_generation)\nSelected source files: src/markupsafe/__init__.py\nSelected test files: tests/test_markupsafe.py\nCreated unverified draft: benchmark/results-holdout/markupsafe-417/fix.patch\nPinned source SHA: 73e6a4886564a554c4a19983d29c97f9fc95457d\nManifest: benchmark/results-holdout/markupsafe-417/manifest.json\nReview the diff and check out the pinned revision before running Docker.\nRun record: benchmark/results-holdout/markupsafe-417/run.json\n",
+    "stderr_tail": ""
+  },
+  "patch_applies": true,
+  "sandbox_full": {
+    "status": "patched_tests_passed",
+    "patch_check": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "\n",
+      "timed_out": false
+    },
+    "baseline": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "................sssssssssssssssss....................                    [100%]\n36 passed, 17 skipped in 0.02s\n\n",
+      "timed_out": false
+    },
+    "patch_apply": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "\n",
+      "timed_out": false
+    },
+    "patched": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "................sssssssssssssssss.....................                   [100%]\n37 passed, 17 skipped in 0.02s\n\n",
+      "timed_out": false
+    },
+    "test_command": [
+      "python",
+      "-m",
+      "pytest",
+      "-q"
+    ],
+    "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+    "source": {
+      "files": 34,
+      "bytes": 53735
+    },
+    "provenance": {
+      "base_commit": "73e6a4886564a554c4a19983d29c97f9fc95457d",
+      "repository": "pallets/markupsafe",
+      "files_checked": 2,
+      "patch_sha256": "e436d3d2b1e11f8bc615642884b2775362b3d986f45cfaed68a26ac7e1c64df1"
+    }
+  },
+  "sandbox_tests_only": {
+    "status": "patched_tests_failed",
+    "patch_check": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "\n",
+      "timed_out": false
+    },
+    "baseline": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "................sssssssssssssssss....................                    [100%]\n36 passed, 17 skipped in 0.02s\n\n",
+      "timed_out": false
+    },
+    "patch_apply": {
+      "passed": true,
+      "exit_code": 0,
+      "output": "\n",
+      "timed_out": false
+    },
+    "patched": {
+      "passed": false,
+      "exit_code": 1,
+      "output": "................sssssssssssssssss...........F.........                   [100%]\n=================================== FAILURES ===================================\n________________________ test_striptags_comment_removal ________________________\n\n    def test_striptags_comment_removal():\n        value = 'x <!-- comment -->'\n>       assert Markup(value).striptags() == 'x'\nE       AssertionError: assert 'x ' == 'x'\nE         \nE         - x\nE         + x\n\ntests/test_markupsafe.py:87: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_markupsafe.py::test_striptags_comment_removal - AssertionEr...\n1 failed, 36 passed, 17 skipped in 0.03s\n\n",
+      "timed_out": false
+    },
+    "test_command": [
+      "python",
+      "-m",
+      "pytest",
+      "-q"
+    ],
+    "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+    "source": {
+      "files": 34,
+      "bytes": 53735
+    }
+  }
+}

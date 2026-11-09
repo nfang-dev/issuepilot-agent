@@ -1,0 +1,52 @@
+{
+  "status": "unsupported",
+  "stage": "eligibility",
+  "issue_url": "https://github.com/executablebooks/markdown-it-py/issues/352",
+  "repository": "executablebooks/markdown-it-py",
+  "revision": "d9b0526122d793a2157be689633114525a761e4e",
+  "detail": "Classified as feature_request.",
+  "eligibility": {
+    "status": "unsupported",
+    "reasons": [
+      {
+        "code": "category_feature_request",
+        "detail": "Classified as feature_request."
+      }
+    ],
+    "category": "feature_request",
+    "confidence": "high",
+    "rationale": "User requests adding a CLI option to the Python package's `markdown-it` command to enable table support. The report includes a reproduction and shows current vs expected behavior. Implementing a new CLI flag is a design decision for maintainers.",
+    "mentioned_symbols": [
+      "markdown_it",
+      "MarkdownIt",
+      "sys",
+      "md",
+      "enable",
+      "render"
+    ],
+    "signals": {
+      "repository_language": "Python",
+      "python_files": 89,
+      "library_python_files": 70,
+      "tree_truncated": false,
+      "labels": [],
+      "blocking_labels": [],
+      "bug_labels": [],
+      "issue_state": "closed",
+      "explicit_revision": true
+    },
+    "model_consulted": true,
+    "human_override": false
+  },
+  "discovery": null,
+  "manifest": null,
+  "usage": {
+    "eligibility": {
+      "requests": 1,
+      "input_tokens": 657,
+      "output_tokens": 685
+    }
+  },
+  "patch_sha256": null,
+  "warning": "Automated decisions and any draft patch are unverified. Review before running the Docker sandbox with --approve."
+}

@@ -1,0 +1,38 @@
+diff --git a/src/markupsafe/__init__.py b/src/markupsafe/__init__.py
+--- a/src/markupsafe/__init__.py
++++ b/src/markupsafe/__init__.py
+@@ -158,8 +158,7 @@
+         >>> Markup("Main &raquo;\t<em>About</em>").striptags()
+         'Main » About'
+         """
+-        # collapse spaces
+-        value = " ".join(self.split())
++        value = str(self)
+ 
+         # Look for comments then tags separately. Otherwise, a comment that
+         # contains a tag would end early, leaving some of the comment behind.
+@@ -192,6 +191,9 @@
+                 break
+ 
+             value = f"{value[:start]}{value[end + 1:]}"
++
++        # collapse spaces
++        value = " ".join(value.split())
+ 
+         return self.__class__(value).unescape()
+ 
+diff --git a/tests/test_markupsafe.py b/tests/test_markupsafe.py
+--- a/tests/test_markupsafe.py
++++ b/tests/test_markupsafe.py
+@@ -82,6 +82,11 @@
+     )
+ 
+ 
++def test_striptags_comment_removal():
++    value = 'x <!-- comment -->'
++    assert Markup(value).striptags() == 'x'
++
++
+ def test_unescape():
+     assert Markup("&lt;test&gt;").unescape() == "<test>"
+ 

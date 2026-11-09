@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "draft_unverified",
+  "repository": "pallets/markupsafe",
+  "issue_url": "https://github.com/pallets/markupsafe/issues/417",
+  "base_commit": "73e6a4886564a554c4a19983d29c97f9fc95457d",
+  "model": "gpt-5-mini",
+  "source_sha256": {
+    "src/markupsafe/__init__.py": "4c6edf0f2c9289490c6d1ab1517c2dc185b6f642125e52991b43f034eb89a29b",
+    "tests/test_markupsafe.py": "2c4a5e92412ade102c7c263f0045ab22f3d7390d5ff59cd93fd6637657c79d2d"
+  },
+  "patch_sha256": "e436d3d2b1e11f8bc615642884b2775362b3d986f45cfaed68a26ac7e1c64df1",
+  "selected_files": [
+    "src/markupsafe/__init__.py",
+    "tests/test_markupsafe.py"
+  ],
+  "modified_files": [
+    "src/markupsafe/__init__.py",
+    "tests/test_markupsafe.py"
+  ],
+  "summary": "Fix Markup.striptags so comments are removed before collapsing whitespace. This prevents leftover spaces when comments are removed (e.g. 'x <!-- comment -->' -> 'x' instead of 'x '). Added a regression test for the reported case.",
+  "risks": "Low. The change only reorders the whitespace collapsing to occur after comment and tag removal in striptags. Behavior of unescape remains unchanged. There is a small risk of changing whitespace normalization in edge cases where tags/comments interact with whitespace, but this aligns with historical behavior and the documented intent to remove tags then normalize whitespace.",
+  "regression_tests": [
+    "test_striptags_comment_removal"
+  ],
+  "warning": "LLM patch draft. Not applied, tested, or approved. Review before Docker execution.",
+  "selection": {
+    "mode": "automatic",
+    "source_files": [
+      "src/markupsafe/__init__.py"
+    ],
+    "test_files": [
+      "tests/test_markupsafe.py"
+    ],
+    "eligibility_category": "logic_bug",
+    "discovery_confidence": "high"
+  }
+}

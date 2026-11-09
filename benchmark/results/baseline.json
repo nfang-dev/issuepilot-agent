@@ -1,0 +1,87 @@
+[
+  {
+    "id": "dotenv-699",
+    "baseline_source_files": [
+      "src/dotenv/cli.py"
+    ],
+    "baseline_recall": 1.0,
+    "baseline_test_hit": true,
+    "baseline_invalid_paths": 0,
+    "baseline_test_in_source": 0,
+    "baseline_tokens": 824,
+    "baseline_error": null,
+    "agent_status": "selected",
+    "agent_recall": 1.0
+  },
+  {
+    "id": "dotenv-697",
+    "baseline_source_files": [
+      "src/dotenv/cli.py",
+      "src/dotenv/main.py"
+    ],
+    "baseline_recall": 1.0,
+    "baseline_test_hit": true,
+    "baseline_invalid_paths": 0,
+    "baseline_test_in_source": 0,
+    "baseline_tokens": 1290,
+    "baseline_error": null,
+    "agent_status": "selected",
+    "agent_recall": 1.0
+  },
+  {
+    "id": "cachetools-423",
+    "baseline_source_files": [
+      "src/cachetools/__init__.py"
+    ],
+    "baseline_recall": 1.0,
+    "baseline_test_hit": true,
+    "baseline_invalid_paths": 0,
+    "baseline_test_in_source": 0,
+    "baseline_tokens": 1275,
+    "baseline_error": null,
+    "agent_status": "selected",
+    "agent_recall": 1.0
+  },
+  {
+    "id": "cachetools-405",
+    "baseline_source_files": [
+      "src/cachetools/__init__.py"
+    ],
+    "baseline_recall": 1.0,
+    "baseline_test_hit": false,
+    "baseline_invalid_paths": 0,
+    "baseline_test_in_source": 0,
+    "baseline_tokens": 1531,
+    "baseline_error": null,
+    "agent_status": "selected",
+    "agent_recall": 1.0
+  },
+  {
+    "id": "pathspec-84",
+    "baseline_source_files": [
+      "pathspec/pathspec.py"
+    ],
+    "baseline_recall": 1.0,
+    "baseline_test_hit": true,
+    "baseline_invalid_paths": 0,
+    "baseline_test_in_source": 0,
+    "baseline_tokens": 1166,
+    "baseline_error": null,
+    "agent_status": "selected",
+    "agent_recall": 1.0
+  },
+  {
+    "id": "pathspec-77",
+    "baseline_source_files": [
+      "pathspec/patterns/gitwildmatch.py"
+    ],
+    "baseline_recall": 1.0,
+    "baseline_test_hit": true,
+    "baseline_invalid_paths": 0,
+    "baseline_test_in_source": 0,
+    "baseline_tokens": 1089,
+    "baseline_error": null,
+    "agent_status": "selected",
+    "agent_recall": 1.0
+  }
+]

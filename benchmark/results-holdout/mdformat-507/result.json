@@ -1,0 +1,11 @@
+{
+  "case": "mdformat-507",
+  "issue_url": "https://github.com/hukkin/mdformat/issues/507",
+  "base_commit": "6b47904826b107356cd34509d2cc4f74455798eb",
+  "pipeline": {
+    "exit_code": 3,
+    "seconds": 1.4,
+    "stdout_tail": "Status: unsupported (stage: eligibility)\nDetail: Issue labels mark it as out of scope: enhancement.\nRun record: benchmark/results-holdout/mdformat-507/run.json\n",
+    "stderr_tail": ""
+  }
+}

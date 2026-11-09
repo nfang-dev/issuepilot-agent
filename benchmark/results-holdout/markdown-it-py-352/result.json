@@ -1,0 +1,11 @@
+{
+  "case": "markdown-it-py-352",
+  "issue_url": "https://github.com/executablebooks/markdown-it-py/issues/352",
+  "base_commit": "d9b0526122d793a2157be689633114525a761e4e",
+  "pipeline": {
+    "exit_code": 3,
+    "seconds": 9.2,
+    "stdout_tail": "Status: unsupported (stage: eligibility)\nDetail: Classified as feature_request.\nRun record: benchmark/results-holdout/markdown-it-py-352/run.json\n",
+    "stderr_tail": ""
+  }
+}

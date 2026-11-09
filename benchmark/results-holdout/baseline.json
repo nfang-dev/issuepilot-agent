@@ -1,0 +1,147 @@
+[
+  {
+    "id": "packaging-938",
+    "baseline_source_files": [
+      "src/packaging/markers.py"
+    ],
+    "baseline_recall": 1.0,
+    "baseline_test_hit": true,
+    "baseline_invalid_paths": 0,
+    "baseline_test_in_source": 0,
+    "baseline_tokens": 2602,
+    "baseline_error": null,
+    "agent_status": "selected",
+    "agent_recall": 1.0
+  },
+  {
+    "id": "packaging-660",
+    "baseline_source_files": [
+      "src/packaging/utils.py"
+    ],
+    "baseline_recall": 1.0,
+    "baseline_test_hit": true,
+    "baseline_invalid_paths": 0,
+    "baseline_test_in_source": 0,
+    "baseline_tokens": 765,
+    "baseline_error": null,
+    "agent_status": "selected",
+    "agent_recall": 1.0
+  },
+  {
+    "id": "markdown-it-py-415",
+    "baseline_source_files": [
+      "markdown_it/rules_block/html_block.py",
+      "markdown_it/rules_block/heading.py"
+    ],
+    "baseline_recall": 1.0,
+    "baseline_test_hit": false,
+    "baseline_invalid_paths": 0,
+    "baseline_test_in_source": 0,
+    "baseline_tokens": 2410,
+    "baseline_error": null,
+    "agent_status": "selected",
+    "agent_recall": 1.0
+  },
+  {
+    "id": "markdown-it-py-352",
+    "baseline_source_files": [
+      "markdown_it/cli/parse.py",
+      "markdown_it/main.py"
+    ],
+    "baseline_recall": 1.0,
+    "baseline_test_hit": true,
+    "baseline_invalid_paths": 0,
+    "baseline_test_in_source": 0,
+    "baseline_tokens": 1362,
+    "baseline_error": null,
+    "agent_status": null,
+    "agent_recall": null
+  },
+  {
+    "id": "tomli-223",
+    "baseline_source_files": [
+      "src/tomli/_parser.py"
+    ],
+    "baseline_recall": 1.0,
+    "baseline_test_hit": true,
+    "baseline_invalid_paths": 0,
+    "baseline_test_in_source": 0,
+    "baseline_tokens": 1091,
+    "baseline_error": null,
+    "agent_status": null,
+    "agent_recall": null
+  },
+  {
+    "id": "tomli-1",
+    "baseline_source_files": [
+      "tomli/__init__.py",
+      "tomli/_parser.py"
+    ],
+    "baseline_recall": 1.0,
+    "baseline_test_hit": false,
+    "baseline_invalid_paths": 0,
+    "baseline_test_in_source": 0,
+    "baseline_tokens": 584,
+    "baseline_error": null,
+    "agent_status": null,
+    "agent_recall": null
+  },
+  {
+    "id": "mdformat-507",
+    "baseline_source_files": [
+      "src/mdformat/_cli.py"
+    ],
+    "baseline_recall": 1.0,
+    "baseline_test_hit": false,
+    "baseline_invalid_paths": 0,
+    "baseline_test_in_source": 0,
+    "baseline_tokens": 1684,
+    "baseline_error": null,
+    "agent_status": null,
+    "agent_recall": null
+  },
+  {
+    "id": "mdformat-357",
+    "baseline_source_files": [
+      "src/mdformat/_api.py",
+      "src/mdformat/_util.py"
+    ],
+    "baseline_recall": 1.0,
+    "baseline_test_hit": true,
+    "baseline_invalid_paths": 0,
+    "baseline_test_in_source": 0,
+    "baseline_tokens": 1062,
+    "baseline_error": null,
+    "agent_status": "selected",
+    "agent_recall": 1.0
+  },
+  {
+    "id": "markupsafe-417",
+    "baseline_source_files": [
+      "src/markupsafe/__init__.py"
+    ],
+    "baseline_recall": 1.0,
+    "baseline_test_hit": true,
+    "baseline_invalid_paths": 0,
+    "baseline_test_in_source": 0,
+    "baseline_tokens": 875,
+    "baseline_error": null,
+    "agent_status": "selected",
+    "agent_recall": 1.0
+  },
+  {
+    "id": "markupsafe-310",
+    "baseline_source_files": [
+      "src/markupsafe/__init__.py",
+      "src/markupsafe/_native.py"
+    ],
+    "baseline_recall": 1.0,
+    "baseline_test_hit": true,
+    "baseline_invalid_paths": 0,
+    "baseline_test_in_source": 0,
+    "baseline_tokens": 830,
+    "baseline_error": null,
+    "agent_status": "selected",
+    "agent_recall": 1.0
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "case": "tomli-223",
+  "issue_url": "https://github.com/hukkin/tomli/issues/223",
+  "base_commit": "facdab0f5aacc5eb223753c42604d5de7bdaee9d",
+  "pipeline": {
+    "exit_code": 3,
+    "seconds": 1.7,
+    "stdout_tail": "Status: unsupported (stage: eligibility)\nDetail: Issue labels mark it as out of scope: enhancement.\nRun record: benchmark/results-holdout/tomli-223/run.json\n",
+    "stderr_tail": ""
+  }
+}

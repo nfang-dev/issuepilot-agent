@@ -1,0 +1,47 @@
+{
+  "status": "unsupported",
+  "stage": "eligibility",
+  "issue_url": "https://github.com/executablebooks/markdown-it-py/issues/295",
+  "repository": "executablebooks/markdown-it-py",
+  "revision": "14cca384e608c49d205866347d66e35cb2b66ff9",
+  "detail": "Classified as documentation.",
+  "eligibility": {
+    "status": "unsupported",
+    "reasons": [
+      {
+        "code": "category_documentation",
+        "detail": "Classified as documentation."
+      }
+    ],
+    "category": "documentation",
+    "confidence": "high",
+    "rationale": "The report says the project documentation claims the library is \"safe by default\" but the Python port enables HTML parsing by default (unsafe), so the docs are misleading. This is primarily a documentation correction (explain how to enable safe mode / note the default), though it references the Python package default configuration.",
+    "mentioned_symbols": [
+      "CommonMark"
+    ],
+    "signals": {
+      "repository_language": "Python",
+      "python_files": 87,
+      "library_python_files": 70,
+      "tree_truncated": false,
+      "labels": [],
+      "blocking_labels": [],
+      "bug_labels": [],
+      "issue_state": "closed",
+      "explicit_revision": true
+    },
+    "model_consulted": true,
+    "human_override": false
+  },
+  "discovery": null,
+  "manifest": null,
+  "usage": {
+    "eligibility": {
+      "requests": 1,
+      "input_tokens": 1421,
+      "output_tokens": 987
+    }
+  },
+  "patch_sha256": null,
+  "warning": "Automated decisions and any draft patch are unverified. Review before running the Docker sandbox with --approve."
+}

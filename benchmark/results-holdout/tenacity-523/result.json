@@ -1,0 +1,11 @@
+{
+  "case": "tenacity-523",
+  "issue_url": "https://github.com/jd/tenacity/issues/523",
+  "base_commit": "1106b9a168c561a5a8b50d97ba6a997ad4483d39",
+  "pipeline": {
+    "exit_code": 3,
+    "seconds": 12.9,
+    "stdout_tail": "Status: unsupported (stage: eligibility)\nDetail: Classified as packaging_or_build.\nRun record: benchmark/results-holdout/tenacity-523/run.json\n",
+    "stderr_tail": ""
+  }
+}

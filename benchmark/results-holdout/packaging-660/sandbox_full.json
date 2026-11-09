@@ -1,0 +1,44 @@
+{
+  "status": "patched_tests_failed",
+  "patch_check": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "baseline": {
+    "passed": false,
+    "exit_code": 2,
+    "output": "\n==================================== ERRORS ====================================\n____________________ ERROR collecting tests/test_elffile.py ____________________\ntests/test_elffile.py:11: in <module>\n    BIN_MUSL_X86_64 = DIR_MUSLLINUX.joinpath(\"musl-x86_64\").read_bytes()\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/usr/local/lib/python3.12/pathlib.py:1019: in read_bytes\n    with self.open(mode='rb') as f:\n         ^^^^^^^^^^^^^^^^^^^^\n/usr/local/lib/python3.12/pathlib.py:1013: in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   FileNotFoundError: [Errno 2] No such file or directory: '/work/repo/tests/musllinux/musl-x86_64'\n=========================== short test summary info ============================\nERROR tests/test_elffile.py - FileNotFoundError: [Errno 2] No such file or di...\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 error in 0.73s\n\n",
+    "timed_out": false
+  },
+  "patch_apply": {
+    "passed": true,
+    "exit_code": 0,
+    "output": "\n",
+    "timed_out": false
+  },
+  "patched": {
+    "passed": false,
+    "exit_code": 2,
+    "output": "\n==================================== ERRORS ====================================\n____________________ ERROR collecting tests/test_elffile.py ____________________\ntests/test_elffile.py:11: in <module>\n    BIN_MUSL_X86_64 = DIR_MUSLLINUX.joinpath(\"musl-x86_64\").read_bytes()\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n/usr/local/lib/python3.12/pathlib.py:1019: in read_bytes\n    with self.open(mode='rb') as f:\n         ^^^^^^^^^^^^^^^^^^^^\n/usr/local/lib/python3.12/pathlib.py:1013: in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE   FileNotFoundError: [Errno 2] No such file or directory: '/work/repo/tests/musllinux/musl-x86_64'\n=========================== short test summary info ============================\nERROR tests/test_elffile.py - FileNotFoundError: [Errno 2] No such file or di...\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 error in 0.72s\n\n",
+    "timed_out": false
+  },
+  "test_command": [
+    "python",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "warning": "Tests run only inside a Docker container; success is not a security guarantee.",
+  "source": {
+    "files": 57,
+    "bytes": 413983
+  },
+  "provenance": {
+    "base_commit": "b509bef6a4573595b23a97ecbfe569000918157f",
+    "repository": "pypa/packaging",
+    "files_checked": 1,
+    "patch_sha256": "4098f8751e8ed74f1687343142c79a397bfb06e18cb57786c83b636dd513d557"
+  }
+}

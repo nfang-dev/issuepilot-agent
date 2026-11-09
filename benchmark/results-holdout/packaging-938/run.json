@@ -1,0 +1,171 @@
+{
+  "status": "draft_ready",
+  "stage": "patch_generation",
+  "issue_url": "https://github.com/pypa/packaging/issues/938",
+  "repository": "pypa/packaging",
+  "revision": "b20096ccce1ca389fa1d3c4290065ab4ede370cc",
+  "detail": "",
+  "eligibility": {
+    "status": "eligible",
+    "reasons": [
+      {
+        "code": "category_logic_bug",
+        "detail": "Supported Python logic bug."
+      }
+    ],
+    "category": "logic_bug",
+    "confidence": "high",
+    "rationale": "The report describes a reproducible incorrect behaviour in Python library code (packaging) where evaluating environment markers containing an extra named like a version (e.g. 'v2') raises InvalidVersion instead of returning False. The issue includes minimal repro code and traceback showing packaging.specifiers.Specifier.contains coercing the extra into a Version. This is a logic bug (wrong behaviour), not a docs/feature/packaging/CI issue, and does not require a design decision to fix.",
+    "mentioned_symbols": [
+      "parse_email",
+      "Metadata",
+      "req.marker.evaluate",
+      "Marker.evaluate",
+      "Specifier.contains",
+      "_coerce_version",
+      "Version",
+      "InvalidVersion"
+    ],
+    "signals": {
+      "repository_language": "Python",
+      "python_files": 37,
+      "library_python_files": 22,
+      "tree_truncated": false,
+      "labels": [],
+      "blocking_labels": [],
+      "bug_labels": [],
+      "issue_state": "closed",
+      "explicit_revision": true
+    },
+    "model_consulted": true,
+    "human_override": false
+  },
+  "discovery": {
+    "status": "selected",
+    "reason": "grounded_selection",
+    "revision": "b20096ccce1ca389fa1d3c4290065ab4ede370cc",
+    "source_files": [
+      "src/packaging/markers.py"
+    ],
+    "test_files": [
+      "tests/test_markers.py"
+    ],
+    "confidence": "high",
+    "rationale": "The failure originates in marker evaluation logic: markers._eval_op attempts to interpret any string RHS as a version Specifier and then calls Specifier.contains(lhs,...). For metadata context default_environment sets 'extra' to an empty string (\"\"), so when evaluating an expression like extra == 'v2' the code constructs a Specifier from the RHS (e.g. '==v2') and then calls spec.contains on the lhs (empty string), which triggers packaging.version.Version('') and raises InvalidVersion. The appropriate fix is therefore in src/packaging/markers.py to avoid using Specifier.contains (and version coercion) for comparisons involving extras (or otherwise guard against empty lhs), rather than changing specifier parsing. tests/test_markers.py is the right place for a regression test since it already contains many marker evaluations including extras-related tests.",
+    "evidence": [
+      {
+        "path": "src/packaging/markers.py",
+        "detail": "_normalize_extras canonicalizes extra values (lines ~125-134). _eval_op tries to create a Specifier from the RHS string and, if successful, calls spec.contains(lhs, prereleases=True) (lines ~160-188). Marker.evaluate sets current_environment['extra'] = \"\" in 'metadata' context (lines ~220-235). These lines together explain why an empty lhs string is passed to Specifier.contains, causing InvalidVersion when Version('') is constructed."
+      },
+      {
+        "path": "tests/test_markers.py",
+        "detail": "Contains existing tests for extras and environment behavior (e.g. test_environment_assumes_empty_extra, test_extra_str_normalization, and other extras-related tests). This is the correct test module to add a regression test for the reported case where an extra name that looks like a version (e.g. 'v2') causes an InvalidVersion error during Marker.evaluate."
+      }
+    ],
+    "provisional": {},
+    "warnings": [],
+    "tool_calls": [
+      {
+        "round": 1,
+        "name": "search_code",
+        "arguments": {
+          "query": "extra",
+          "path_prefix": "src/packaging"
+        },
+        "ok": true
+      },
+      {
+        "round": 2,
+        "name": "read_file",
+        "arguments": {
+          "path": "src/packaging/markers.py"
+        },
+        "ok": true
+      },
+      {
+        "round": 3,
+        "name": "search_code",
+        "arguments": {
+          "query": "extra == 'v2'",
+          "path_prefix": ""
+        },
+        "ok": true
+      },
+      {
+        "round": 4,
+        "name": "read_file",
+        "arguments": {
+          "path": "tests/test_markers.py"
+        },
+        "ok": true
+      }
+    ],
+    "submissions": [
+      {
+        "round": 5,
+        "accepted": true,
+        "problems": [],
+        "decision": "selected"
+      }
+    ],
+    "exploration_calls": 4,
+    "file_fetches": 13
+  },
+  "manifest": {
+    "schema_version": 1,
+    "status": "draft_unverified",
+    "repository": "pypa/packaging",
+    "issue_url": "https://github.com/pypa/packaging/issues/938",
+    "base_commit": "b20096ccce1ca389fa1d3c4290065ab4ede370cc",
+    "model": "gpt-5-mini",
+    "source_sha256": {
+      "src/packaging/markers.py": "224013cff18f02804483b31f401587720ce645249183f2f9603c0d6f6585f14e",
+      "tests/test_markers.py": "2781a2f716f312ffcb6aed04bb1602e58ca81a659cdc574f0762f9d519016a4b"
+    },
+    "patch_sha256": "a9227b5208ba6f2fbed4502cb05e9151310e6435f7c90821e2ee8a0d227b8013",
+    "selected_files": [
+      "src/packaging/markers.py",
+      "tests/test_markers.py"
+    ],
+    "modified_files": [
+      "src/packaging/markers.py",
+      "tests/test_markers.py"
+    ],
+    "summary": "Avoid attempting to coerce an empty string to a Version during marker evaluation. When a Specifier is successfully constructed for a string RHS, if the LHS is the empty string (which happens for 'extra' when no extra is selected), return False instead of calling spec.contains which triggers Version('') and raises InvalidVersion. Also add a regression test asserting that version-like extra names (e.g. 'v2') do not raise and evaluate as expected.",
+    "risks": "Minimal. The change only affects the branch where a string RHS parsed as a Specifier and the LHS is the empty string. It returns False in that case, which matches expected behaviour for extras. Other comparisons are unchanged.",
+    "regression_tests": [
+      "tests/test_markers.py::TestMarker::test_extra_version_like_name"
+    ],
+    "warning": "LLM patch draft. Not applied, tested, or approved. Review before Docker execution.",
+    "selection": {
+      "mode": "automatic",
+      "source_files": [
+        "src/packaging/markers.py"
+      ],
+      "test_files": [
+        "tests/test_markers.py"
+      ],
+      "eligibility_category": "logic_bug",
+      "discovery_confidence": "high"
+    }
+  },
+  "usage": {
+    "eligibility": {
+      "requests": 1,
+      "input_tokens": 1929,
+      "output_tokens": 532
+    },
+    "discovery": {
+      "requests": 5,
+      "input_tokens": 36961,
+      "output_tokens": 1806
+    },
+    "patch_generation": {
+      "requests": 1,
+      "input_tokens": 8937,
+      "output_tokens": 2937
+    }
+  },
+  "patch_sha256": "a9227b5208ba6f2fbed4502cb05e9151310e6435f7c90821e2ee8a0d227b8013",
+  "warning": "Automated decisions and any draft patch are unverified. Review before running the Docker sandbox with --approve."
+}

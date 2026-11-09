@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "status": "draft_unverified",
+  "repository": "pypa/packaging",
+  "issue_url": "https://github.com/pypa/packaging/issues/660",
+  "base_commit": "b509bef6a4573595b23a97ecbfe569000918157f",
+  "model": "gpt-5-mini",
+  "source_sha256": {
+    "src/packaging/utils.py": "678fb6556a5908b2ee54901a971d3e6e5f14e46b3d9e854558f09d43b8b4058d"
+  },
+  "patch_sha256": "4098f8751e8ed74f1687343142c79a397bfb06e18cb57786c83b636dd513d557",
+  "selected_files": [
+    "src/packaging/utils.py"
+  ],
+  "modified_files": [
+    "src/packaging/utils.py"
+  ],
+  "summary": "Catch packaging.version.InvalidVersion raised while parsing versions from filenames and re-raise as InvalidWheelFilename or InvalidSdistFilename respectively. This ensures callers get filename-related exceptions instead of InvalidVersion when a filename contains an invalid PEP 440 version.",
+  "risks": "Low. The change only converts an InvalidVersion exception to the already-used InvalidWheelFilename/InvalidSdistFilename in two parsing code paths, preserving previous public API behavior that flagged invalid filenames. Messages include the offending version and filename. No other behavior is changed. If callers relied on catching InvalidVersion specifically from these utilities (unlikely), they will need to catch the InvalidWheelFilename/InvalidSdistFilename instead.",
+  "regression_tests": [
+    "tests/test_utils.py::test_parse_wheel_filename_invalid_version_raises_InvalidWheelFilename",
+    "tests/test_utils.py::test_parse_sdist_filename_invalid_version_raises_InvalidSdistFilename"
+  ],
+  "warning": "LLM patch draft. Not applied, tested, or approved. Review before Docker execution.",
+  "selection": {
+    "mode": "automatic",
+    "source_files": [
+      "src/packaging/utils.py"
+    ],
+    "test_files": [],
+    "eligibility_category": "logic_bug",
+    "discovery_confidence": "high"
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "status": "draft_ready",
+  "stage": "patch_generation",
+  "issue_url": "https://github.com/pallets/markupsafe/issues/417",
+  "repository": "pallets/markupsafe",
+  "revision": "73e6a4886564a554c4a19983d29c97f9fc95457d",
+  "detail": "",
+  "eligibility": {
+    "status": "eligible",
+    "reasons": [
+      {
+        "code": "category_logic_bug",
+        "detail": "Supported Python logic bug."
+      }
+    ],
+    "category": "logic_bug",
+    "confidence": "high",
+    "rationale": "The report shows a behavioral regression in Python library code: Markup.striptags changed semantics in markupsafe 2.1.4 and now leaves a space where an HTML comment was previously removed. A minimal unit test reproduces the difference. The root cause (noted in comments) is the order of operations: whitespace coalescing is performed before stripping comments/tags, causing an extra space to remain. This is a logic bug in the Python implementation and can be fixed and covered by a unit test.",
+    "mentioned_symbols": [
+      "Markup.striptags",
+      "Markup",
+      "striptags"
+    ],
+    "signals": {
+      "repository_language": "Python",
+      "python_files": 15,
+      "library_python_files": 8,
+      "tree_truncated": false,
+      "labels": [],
+      "blocking_labels": [],
+      "bug_labels": [],
+      "issue_state": "closed",
+      "explicit_revision": true
+    },
+    "model_consulted": true,
+    "human_override": false
+  },
+  "discovery": {
+    "status": "selected",
+    "reason": "grounded_selection",
+    "revision": "73e6a4886564a554c4a19983d29c97f9fc95457d",
+    "source_files": [
+      "src/markupsafe/__init__.py"
+    ],
+    "test_files": [
+      "tests/test_markupsafe.py"
+    ],
+    "confidence": "high",
+    "rationale": "The bug described (comments replaced with a space by Markup.striptags) is implemented in Markup.striptags in src/markupsafe/__init__.py. The method currently collapses whitespace first then removes comments and tags, which matches the change noted in the issue and is the root cause. The existing test suite that covers striptags behaviour is tests/test_markupsafe.py (test_escaping uses .striptags()). A regression test for the reported case should be added/adjusted there.\n\nFiles selected:\n- src/markupsafe/__init__.py: contains the implementation of Markup.striptags; the order-of-operations causing the issue is present here.\n- tests/test_markupsafe.py: existing test module that verifies striptags behaviour and is the appropriate place to add a regression test.",
+    "evidence": [
+      {
+        "path": "src/markupsafe/__init__.py",
+        "detail": "Markup.striptags: 'value = \" \".join(self.split())' (collapse spaces) then loops to remove comments (find '<!--' and '-->') and tags (find '<' and '>'), returning self.__class__(value).unescape(). This shows whitespace is collapsed before comment/tag removal."
+      },
+      {
+        "path": "tests/test_markupsafe.py",
+        "detail": "test_escaping uses Markup(...).striptags() and asserts result == 'Foo & Bar'. This test module already exercises striptags and is the right place for a regression test for the 'x <!-- comment -->' case."
+      }
+    ],
+    "provisional": {},
+    "warnings": [],
+    "tool_calls": [
+      {
+        "round": 1,
+        "name": "search_code",
+        "arguments": {
+          "query": "striptags",
+          "path_prefix": ""
+        },
+        "ok": true
+      },
+      {
+        "round": 2,
+        "name": "read_file",
+        "arguments": {
+          "path": "src/markupsafe/__init__.py"
+        },
+        "ok": true
+      },
+      {
+        "round": 3,
+        "name": "search_code",
+        "arguments": {
+          "query": "striptags",
+          "path_prefix": "tests"
+        },
+        "ok": true
+      },
+      {
+        "round": 4,
+        "name": "read_file",
+        "arguments": {
+          "path": "tests/test_markupsafe.py"
+        },
+        "ok": true
+      }
+    ],
+    "submissions": [
+      {
+        "round": 5,
+        "accepted": true,
+        "problems": [],
+        "decision": "selected"
+      }
+    ],
+    "exploration_calls": 4,
+    "file_fetches": 15
+  },
+  "manifest": {
+    "schema_version": 1,
+    "status": "draft_unverified",
+    "repository": "pallets/markupsafe",
+    "issue_url": "https://github.com/pallets/markupsafe/issues/417",
+    "base_commit": "73e6a4886564a554c4a19983d29c97f9fc95457d",
+    "model": "gpt-5-mini",
+    "source_sha256": {
+      "src/markupsafe/__init__.py": "4c6edf0f2c9289490c6d1ab1517c2dc185b6f642125e52991b43f034eb89a29b",
+      "tests/test_markupsafe.py": "2c4a5e92412ade102c7c263f0045ab22f3d7390d5ff59cd93fd6637657c79d2d"
+    },
+    "patch_sha256": "e436d3d2b1e11f8bc615642884b2775362b3d986f45cfaed68a26ac7e1c64df1",
+    "selected_files": [
+      "src/markupsafe/__init__.py",
+      "tests/test_markupsafe.py"
+    ],
+    "modified_files": [
+      "src/markupsafe/__init__.py",
+      "tests/test_markupsafe.py"
+    ],
+    "summary": "Fix Markup.striptags so comments are removed before collapsing whitespace. This prevents leftover spaces when comments are removed (e.g. 'x <!-- comment -->' -> 'x' instead of 'x '). Added a regression test for the reported case.",
+    "risks": "Low. The change only reorders the whitespace collapsing to occur after comment and tag removal in striptags. Behavior of unescape remains unchanged. There is a small risk of changing whitespace normalization in edge cases where tags/comments interact with whitespace, but this aligns with historical behavior and the documented intent to remove tags then normalize whitespace.",
+    "regression_tests": [
+      "test_striptags_comment_removal"
+    ],
+    "warning": "LLM patch draft. Not applied, tested, or approved. Review before Docker execution.",
+    "selection": {
+      "mode": "automatic",
+      "source_files": [
+        "src/markupsafe/__init__.py"
+      ],
+      "test_files": [
+        "tests/test_markupsafe.py"
+      ],
+      "eligibility_category": "logic_bug",
+      "discovery_confidence": "high"
+    }
+  },
+  "usage": {
+    "eligibility": {
+      "requests": 1,
+      "input_tokens": 908,
+      "output_tokens": 594
+    },
+    "discovery": {
+      "requests": 5,
+      "input_tokens": 22222,
+      "output_tokens": 1231
+    },
+    "patch_generation": {
+      "requests": 1,
+      "input_tokens": 5180,
+      "output_tokens": 3263
+    }
+  },
+  "patch_sha256": "e436d3d2b1e11f8bc615642884b2775362b3d986f45cfaed68a26ac7e1c64df1",
+  "warning": "Automated decisions and any draft patch are unverified. Review before running the Docker sandbox with --approve."
+}
