@@ -7,12 +7,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from benchmark.harness import BENCH_DIR, load_cases, render_markdown, score_case, summarize  # noqa: E402
+from benchmark.harness import BENCH_DIR, CASES_FILE, load_cases, render_markdown, score_case, summarize  # noqa: E402
 
 
-def main(results: Path = BENCH_DIR / "results") -> None:
+def main(cases_file: Path = CASES_FILE, results: Path = BENCH_DIR / "results") -> None:
     rows = []
-    for case in load_cases():
+    for case in load_cases(cases_file):
         folder = results / case["id"]
         if not (folder / "result.json").exists():
             print(f"missing: {case['id']} (not run yet)")
@@ -33,4 +33,9 @@ def main(results: Path = BENCH_DIR / "results") -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--cases", type=Path, default=CASES_FILE)
+    parser.add_argument("--results", type=Path, default=BENCH_DIR / "results")
+    args = parser.parse_args()
+    main(args.cases, args.results)

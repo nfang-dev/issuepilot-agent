@@ -25,7 +25,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from benchmark.harness import BENCH_DIR, issue_url, load_cases, split_diff  # noqa: E402
+from benchmark.harness import BENCH_DIR, CASES_FILE, issue_url, load_cases, split_diff  # noqa: E402
 
 OUTPUTS = ("fix.patch", "manifest.json", "run.json", "sandbox_full.json",
            "tests_only.patch", "sandbox_tests_only.json", "result.json")
@@ -93,13 +93,14 @@ def run_case(case: dict, out: Path, checkouts: Path, model: str) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--cases", type=Path, default=CASES_FILE, help="Case file (default: dev set)")
     parser.add_argument("--case", action="append", help="Run only these case ids (repeatable)")
     parser.add_argument("--model", default="gpt-5-mini")
     parser.add_argument("--results", type=Path, default=BENCH_DIR / "results")
     parser.add_argument("--checkouts", type=Path, default=BENCH_DIR / "checkouts")
     parser.add_argument("--skip-existing", action="store_true", help="Keep cases that already have result.json")
     args = parser.parse_args()
-    cases = load_cases()
+    cases = load_cases(args.cases)
     if args.case:
         unknown = set(args.case) - {c["id"] for c in cases}
         if unknown:
@@ -122,7 +123,7 @@ def main() -> None:
         print(f"    pipeline={run.get('status')} applies={result.get('patch_applies')} "
               f"sandbox={result.get('sandbox_full', {}).get('status')} "
               f"tests_only={result.get('sandbox_tests_only', {}).get('status')}")
-    print("Done. Score with: python benchmark/score.py")
+    print(f"Done. Score with: python benchmark/score.py --cases {args.cases} --results {args.results}")
 
 
 if __name__ == "__main__":

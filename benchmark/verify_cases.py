@@ -13,7 +13,7 @@ import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from benchmark.harness import load_cases  # noqa: E402
+from benchmark.harness import CASES_FILE, load_cases  # noqa: E402
 
 
 def main() -> None:
@@ -21,8 +21,9 @@ def main() -> None:
     headers = {"Accept": "application/vnd.github+json", "User-Agent": "issuepilot-benchmark"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
+    cases_file = Path(sys.argv[1]) if len(sys.argv) > 1 else CASES_FILE
     problems = 0
-    for case in load_cases():
+    for case in load_cases(cases_file):
         base = f"https://api.github.com/repos/{case['repo']}"
         issue = requests.get(f"{base}/issues/{case['issue']}", headers=headers, timeout=20)
         commit = requests.get(f"{base}/commits/{case['fix_commit']}", headers=headers, timeout=20)

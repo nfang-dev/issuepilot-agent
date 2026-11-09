@@ -19,6 +19,10 @@ from typing import Any
 
 from issuepilot.github_api import SHA_RE, GitHubAPI, allowed_path, parse_issue_url
 
+# Reasoning models spend part of this budget on hidden reasoning; 7,000 truncated a
+# real benchmark case (dotenv-697, benchmark run 1).
+PATCH_MAX_OUTPUT_TOKENS = 16_000
+
 
 MAX_FILES = 4
 MAX_TOTAL_BYTES = 44_000
@@ -172,8 +176,11 @@ def generate(
         instructions=SYSTEM,
         input=[{"role": "user", "content": "\n\n".join(context)}],
         text={"format": PLAN_SCHEMA},
-        max_output_tokens=7000,
+        max_output_tokens=PATCH_MAX_OUTPUT_TOKENS,
     )
+    if getattr(response, "status", None) == "incomplete":
+        raise ValueError("Model output hit the token limit before finishing the edit plan; "
+                         "no patch was created")
     raw = (getattr(response, "output_text", "") or "").strip()
     try:
         plan = json.loads(raw)

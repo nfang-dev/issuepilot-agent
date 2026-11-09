@@ -191,6 +191,18 @@ def test_human_can_continue_past_needs_review_but_not_unsupported():
     assert result.status == UNSUPPORTED and result.eligibility["human_override"] is False
 
 
+def test_truncated_patch_response_fails_closed_with_clear_reason():
+    from types import SimpleNamespace as NS
+    truncated = NS(output=[], output_text='{"summary": "cut', status="incomplete",
+                   usage=NS(input_tokens=10, output_tokens=16000))
+    api, _ = api_for(rowkit(), 12)
+    model = script(*ROWKIT_DISCOVERY)
+    model.steps.append(("patch", truncated))
+    result = run_auto(api, model)
+    assert result.status == PATCH_FAILED and "token limit" in result.detail
+    assert model.requests[-1]["max_output_tokens"] == pg.PATCH_MAX_OUTPUT_TOKENS
+
+
 def test_stop_after_eligibility_and_discovery():
     api, _ = api_for(rowkit(), 12)
     model = script()

@@ -115,3 +115,41 @@ def test_summary_rates_keep_denominators_and_exclude_infrastructure():
     assert summary["outcomes"]["validated"] == 1
     markdown = render_markdown(summary, rows)
     assert "| demo-2 |" in markdown and "infrastructure" in markdown
+
+
+# --------------------------------------------------------- holdout selection
+
+from benchmark.mine_candidates import classify  # noqa: E402
+
+
+def gql_issue(files, labels=(), state="COMPLETED", closed="2025-05-01T00:00:00Z", prs=1, merged=True):
+    pr = {"number": 7, "merged": merged,
+          "mergeCommit": {"oid": "b" * 40, "parents": {"nodes": [{"oid": "a" * 40}]}},
+          "files": {"nodes": [{"path": p, "additions": a, "deletions": d} for p, a, d in files]}}
+    return {"number": 42, "title": "Something is wrong", "closedAt": closed, "stateReason": state,
+            "labels": {"nodes": [{"name": n} for n in labels]},
+            "closedByPullRequestsReferences": {"nodes": [pr] * prs}}
+
+
+def test_mining_selects_small_fix_with_tests_as_positive():
+    case = classify(gql_issue([("src/pkg/core.py", 3, 1), ("tests/test_core.py", 10, 0)]), "o", "r")
+    assert case["kind"] == "positive" and case["gold_source_files"] == ["src/pkg/core.py"]
+    assert case["base_commit"] == "a" * 40 and case["fix_commit"] == "b" * 40
+
+
+@pytest.mark.parametrize("issue", [
+    gql_issue([("src/pkg/core.py", 3, 1)]),                                   # no test change
+    gql_issue([("src/pkg/core.py", 25, 10), ("tests/test_core.py", 1, 0)]),  # > 30 lines
+    gql_issue([("a.py", 1, 0), ("b.py", 1, 0), ("c.py", 1, 0), ("tests/test_a.py", 1, 0)]),  # 3 files
+    gql_issue([("src/pkg/core.py", 3, 1), ("tests/test_core.py", 1, 0)], state="NOT_PLANNED"),
+    gql_issue([("src/pkg/core.py", 3, 1), ("tests/test_core.py", 1, 0)], closed="2019-01-01T00:00:00Z"),
+    gql_issue([("src/pkg/core.py", 3, 1), ("tests/test_core.py", 1, 0)], prs=2),
+    gql_issue([("docs/index.md", 3, 1)], labels=("documentation",)),         # gate would reject anyway
+])
+def test_mining_rejects_cases_outside_the_rule(issue):
+    assert classify(issue, "o", "r") is None
+
+
+def test_mining_docs_only_fix_without_blocking_label_is_negative():
+    case = classify(gql_issue([("docs/index.md", 3, 1), ("README.md", 1, 0)], labels=("bug",)), "o", "r")
+    assert case["kind"] == "negative" and case["expected_eligibility"] == "unsupported"

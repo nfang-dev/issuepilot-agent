@@ -66,6 +66,15 @@ Raw per-case artefacts are in [`results/`](results/) and the generated table is 
 
 **What this run supports:** on small, self-contained fixes, discovery located the right source file in every case it reached, and half of the bug cases ended with a Docker-validated draft whose source change also passes the upstream regression tests. **What it does not support:** any success rate beyond these 8 cases, or performance on large files, multi-file fixes, or fresh (unfixed) issues.
 
+## Run 2 protocol: holdout set + LLM-only baseline (fixed 2026-11-08, before selection)
+
+The 8 cases above are now the **development set**: their results have been read and one change was made because of them (patch-generation output cap raised from 7,000 to 16,000 tokens after dotenv-697 truncated; truncation is now reported explicitly). Nothing else was tuned.
+
+1. **Holdout selection.** `mine_candidates.py` selects about 13 new cases from repositories not in the dev set, using a mechanical rule written in its docstring (issue closed as completed, closed by exactly one merged PR, PR changes 1-2 small source files plus a test; negatives are no-Python-change fixes without a gate-blocking label). It writes `holdout.json`, which is committed **before** any run and never re-selected or edited.
+2. **One run.** `run.py --cases benchmark/holdout.json --results benchmark/results-holdout` runs every holdout case once with the frozen code. No prompt or code changes between holdout cases, and no re-runs to improve scores.
+3. **Baseline.** `baseline.py` runs an LLM-only file-localization baseline on both sets: same model, issue text and pinned commit, the full list of Python files, one structured call, no tools, no file contents, no evidence validation. It answers whether the tool-using agent localizes files better than a single prompt.
+4. **Reporting.** Dev and holdout results are reported separately; the headline numbers come from the holdout set.
+
 ## Known limitations (declared up front)
 
 - 8 cases is a case study, not a statistically meaningful success rate.
