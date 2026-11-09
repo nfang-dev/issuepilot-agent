@@ -245,6 +245,8 @@ A manual live run was completed on November 5, 2026 (US Pacific time), using the
 - [ ] Run at least two further issues across another public repository.
 - [x] Run the V5 URL-only pipeline live end to end on one real issue with Docker validation (itsdangerous #429: correct source file, regression test misplaced; see above).
 - [x] Run the pre-registered [mini benchmark](benchmark/README.md) (8 fixed issues, 4 repositories): discovery recall 6/6, 3/6 bug cases Docker-validated with source changes that also pass upstream's regression tests, 2 generator failures (fail-closed), 1 infrastructure, 1 eligibility miss.
+- [x] Run a pre-registered holdout set (13 cases, 6 new repositories) and an LLM-only localization baseline. Combined with the dev set: 12/12 root-cause files located, 5 Docker-validated fixes that all pass upstream regression tests; the baseline matched localization on these small repos (see [benchmark](benchmark/README.md)).
+- [ ] Evaluate localization on larger repositories where a single prompt cannot see the right file; relax sandbox staging for binary test fixtures.
 - [ ] Run the V5 URL-only pipeline live on several more public issues (including closed issues pinned with `--revision` to the commit before their fix); record eligibility decisions, selected files versus the files the real fix touched, and failure reasons.
 - [ ] Review `tool-trace.json` for exact call sequence, failures, and token usage; record latency.
 - [ ] Compare against a one-shot issue summarization baseline and score evidence grounding and proposed fixes.
